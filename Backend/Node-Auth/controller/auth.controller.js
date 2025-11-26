@@ -59,6 +59,9 @@ exports.login = async (req, res) => {
         if (err) {
           return res.status(500).send("Something went wrong!");
         } else {
+          if (result.length == 0) {
+            return res.status(404).send("User not found!");
+          }
           user = result[0];
         }
       }
@@ -69,7 +72,7 @@ exports.login = async (req, res) => {
       return res.status(200).json({
         message: "User logged in successfully!",
         token,
-      })
+      });
     } else {
       return res.status(400).send("Wrong password!");
     }
@@ -78,3 +81,11 @@ exports.login = async (req, res) => {
     return res.status(500).send("Internal server error!");
   }
 };
+
+exports.verifyToken = () => {
+
+}
+
+exports.logout = () => {
+    
+}

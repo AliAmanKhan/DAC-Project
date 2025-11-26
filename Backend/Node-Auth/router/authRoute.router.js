@@ -3,6 +3,7 @@ const { verifyToken } = require("../middleware/jwtAuth");
 const express = require("express");
 const router = express.Router();
 
-router.post("/signup", verifyToken, controller.signup);
+router.post("/signup", controller.signup);
+router.post("/login", controller.login);
 
 module.export = router;
