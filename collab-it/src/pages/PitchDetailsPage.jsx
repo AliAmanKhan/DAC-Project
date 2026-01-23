@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { ArrowLeft, Users, Award, MessageSquare, Share2, Zap } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
-// import Navbar from "../components/NAvbar"
+import Navbar from "../components/Navbar"
 
 const PITCH_DATA = {
   1: {
