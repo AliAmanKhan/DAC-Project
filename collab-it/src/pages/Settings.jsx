@@ -174,7 +174,7 @@ export default function Settings() {
                   key={key}
                   className="flex items-center justify-between p-4 rounded-lg hover:bg-primary/5 transition"
                 >
-                  <div>
+                  <div className="text-left">
                     <h3 className="font-semibold capitalize">{key} Notifications</h3>
                     <p className="text-sm text-muted-foreground">
                       Receive {key} updates about your projects and collaborations
@@ -182,13 +182,13 @@ export default function Settings() {
                   </div>
                   <button
                     onClick={() => handleToggle("notifications", key)}
-                    className={`relative inline-flex h-6 w-11 rounded-full transition ${
-                      value ? "bg-primary" : "bg-gray-600"
+                    className={`relative inline-flex h-8 w-14 rounded-full transition-all duration-300 ${
+                      value ? "bg-blue-700 shadow-lg shadow-blue-500/50" : "bg-gray-500 shadow-lg shadow-gray-500/30"
                     }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                        value ? "translate-x-6" : "translate-x-1"
+                      className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-md transition-all duration-300 ${
+                        value ? "translate-x-7" : "translate-x-1"
                       } mt-1`}
                     />
                   </button>
@@ -207,7 +207,7 @@ export default function Settings() {
                   key={key}
                   className="flex items-center justify-between p-4 rounded-lg hover:bg-primary/5 transition"
                 >
-                  <div>
+                  <div className="text-left">
                     <h3 className="font-semibold capitalize">
                       {key.replace(/([A-Z])/g, " $1")}
                     </h3>
@@ -219,13 +219,13 @@ export default function Settings() {
                   </div>
                   <button
                     onClick={() => handleToggle("privacy", key)}
-                    className={`relative inline-flex h-6 w-11 rounded-full transition ${
-                      value ? "bg-primary" : "bg-gray-600"
+                    className={`relative inline-flex h-8 w-14 rounded-full transition-all duration-300 ${
+                      value ? "bg-blue-700 shadow-lg shadow-blue-500/50" : "bg-gray-500 shadow-lg shadow-gray-500/30"
                     }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                        value ? "translate-x-6" : "translate-x-1"
+                      className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-md transition-all duration-300 ${
+                        value ? "translate-x-7" : "translate-x-1"
                       } mt-1`}
                     />
                   </button>
@@ -239,7 +239,7 @@ export default function Settings() {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="flex-1 px-6 py-3 rounded-lg bg-primary text-white hover:bg-primary/90 transition font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-3 rounded-lg bg-primary text-white border-2 border-white hover:bg-primary/90 transition font-medium disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <Save className="w-5 h-5" />
               {isSaving ? "Saving..." : "Save Changes"}

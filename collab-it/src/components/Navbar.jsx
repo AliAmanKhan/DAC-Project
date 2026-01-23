@@ -24,7 +24,7 @@ export default function Navbar() {
             Create Pitch
           </Link>
 
-          <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4">
             <button className="p-2 hover:bg-card rounded-lg transition relative">
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
