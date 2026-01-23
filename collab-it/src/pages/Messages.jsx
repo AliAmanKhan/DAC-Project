@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Send, Search, Pin, Archive, MoreVertical } from "lucide-react";
+import { Send, Search, Pin, Archive, MoreVertical, ChevronLeft } from "lucide-react";
 
 export default function Messages() {
   const [conversations] = useState([
@@ -62,6 +62,7 @@ export default function Messages() {
     },
   ]);
   const [messageInput, setMessageInput] = useState("");
+  const [showConversations, setShowConversations] = useState(true);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -93,12 +94,24 @@ export default function Messages() {
       </section>
 
       {/* Main Content */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex h-screen gap-6">
+      <section className="w-full px-0 sm:px-0 py-0">
+        <div className="flex gap-0 h-[calc(100vh-180px)] md:h-[calc(100vh-220px)] relative bg-slate-950">
+          {/* Mobile Overlay */}
+          {showConversations && (
+            <div
+              className="md:hidden fixed inset-0 bg-black/70 z-30"
+              onClick={() => setShowConversations(false)}
+            />
+          )}
+
           {/* Conversations List */}
-          <div className="w-80 bg-card border border-border rounded-lg overflow-hidden flex flex-col">
+          <div
+            className={`${
+              showConversations ? "flex z-40" : "hidden"
+            } md:flex md:z-auto w-full md:w-80 bg-slate-900 border-r border-border overflow-hidden flex-col fixed md:relative inset-0 md:inset-auto`}
+          >
             {/* Search */}
-            <div className="p-4 border-b border-border">
+            <div className="p-4 border-b border-border bg-card">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
@@ -110,11 +123,14 @@ export default function Messages() {
             </div>
 
             {/* Conversations */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto bg-card">
               {conversations.map((conversation) => (
                 <button
                   key={conversation.id}
-                  onClick={() => setSelectedConversation(conversation)}
+                  onClick={() => {
+                    setSelectedConversation(conversation);
+                    setShowConversations(false);
+                  }}
                   className={`w-full px-4 py-4 border-b border-border hover:bg-primary/5 transition text-left ${
                     selectedConversation.id === conversation.id
                       ? "bg-primary/10 border-l-4 border-l-primary"
@@ -152,25 +168,31 @@ export default function Messages() {
           </div>
 
           {/* Chat Area */}
-          <div className="flex-1 bg-card border border-border rounded-lg flex flex-col">
+          <div className="flex-1 bg-slate-950 border-l border-border flex flex-col">
             {/* Header */}
-            <div className="p-6 border-b border-border flex items-center justify-between">
-              <div className="flex items-center gap-3">
+            <div className="p-4 md:p-6 border-b border-border flex items-center justify-between gap-4 bg-slate-900">
+              <div className="flex items-center gap-3 min-w-0">
+                <button
+                  onClick={() => setShowConversations(true)}
+                  className="md:hidden p-2 hover:bg-primary/10 rounded-lg transition"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
                 <img
                   src={selectedConversation.avatar}
                   alt={selectedConversation.name}
-                  className="w-10 h-10 rounded-full bg-primary/20"
+                  className="w-10 h-10 rounded-full bg-primary/20 flex-shrink-0"
                 />
-                <div>
-                  <h2 className="font-bold">{selectedConversation.name}</h2>
+                <div className="min-w-0">
+                  <h2 className="font-bold truncate">{selectedConversation.name}</h2>
                   <p className="text-sm text-muted-foreground">Active now</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button className="p-2 hover:bg-primary/10 rounded-lg transition">
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button className="p-2 hover:bg-primary/10 rounded-lg transition hidden sm:block">
                   <Pin className="w-5 h-5" />
                 </button>
-                <button className="p-2 hover:bg-primary/10 rounded-lg transition">
+                <button className="p-2 hover:bg-primary/10 rounded-lg transition hidden sm:block">
                   <Archive className="w-5 h-5" />
                 </button>
                 <button className="p-2 hover:bg-primary/10 rounded-lg transition">
@@ -180,25 +202,29 @@ export default function Messages() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 bg-slate-950">
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-xs px-4 py-2 rounded-lg ${
-                      message.isOwn
-                        ? "bg-primary text-white rounded-br-none"
-                        : "bg-primary/10 text-foreground rounded-bl-none"
-                    }`}
+                    className={`flex flex-col ${message.isOwn ? "items-end" : "items-start"} gap-1`}
                   >
-                    <p className="text-sm">{message.content}</p>
-                    <p
-                      className={`text-xs mt-1 ${
+                    <div
+                      className={`px-4 py-3 rounded-2xl max-w-sm break-words border ${
                         message.isOwn
-                          ? "text-white/70"
-                          : "text-muted-foreground"
+                          ? "bg-blue-600 text-white border-blue-500"
+                          : "bg-slate-800 text-white border-slate-700"
+                      }`}
+                    >
+                      <p className="text-sm leading-relaxed">{message.content}</p>
+                    </div>
+                    <p
+                      className={`text-xs px-2 ${
+                        message.isOwn
+                          ? "text-slate-400"
+                          : "text-slate-400"
                       }`}
                     >
                       {message.timestamp}
@@ -209,18 +235,18 @@ export default function Messages() {
             </div>
 
             {/* Input */}
-            <div className="p-6 border-t border-border">
+            <div className="p-4 md:p-6 border-t border-border bg-slate-900">
               <form onSubmit={handleSendMessage} className="flex gap-3">
                 <input
                   type="text"
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   placeholder="Type a message..."
-                  className="flex-1 px-4 py-2 rounded-lg bg-input border border-border focus:ring-2 focus:ring-primary outline-none transition"
+                  className="flex-1 px-4 py-2 rounded-lg bg-input border border-border focus:ring-2 focus:ring-primary outline-none transition text-sm"
                 />
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition flex items-center gap-2"
+                  className="px-4 md:px-6 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition flex items-center gap-2 flex-shrink-0"
                 >
                   <Send className="w-4 h-4" />
                 </button>
