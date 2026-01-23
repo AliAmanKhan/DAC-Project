@@ -1,5 +1,6 @@
 import React from "react";
 import CreatePitch from "../components/CreatePitch";
+import NewCreatePitch from "../components/NewCreatePitch";
 
 export default function NewPitch() {
   const currentUser = {
@@ -11,5 +12,5 @@ export default function NewPitch() {
     console.log("New pitch:", pitch);
     // setPitches((prev) => [pitch, ...prev]);
   };
-  return <CreatePitch currentUser={currentUser} onCreate={handlePitchCreate} />;
+  return <NewCreatePitch currentUser={currentUser} onCreate={handlePitchCreate} />;
 }
