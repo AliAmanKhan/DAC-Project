@@ -35,6 +35,7 @@ public class UserProfileController {
             @Valid @RequestBody UserProfileUpdateRequest request
     ) {
         return ResponseEntity.ok(
+                
                 service.updateProfile(userId, request)
         );
     }
