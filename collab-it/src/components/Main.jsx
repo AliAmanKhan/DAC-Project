@@ -9,18 +9,20 @@ import Profile from "../pages/Profile";
 import PitchDetailPage from "../pages/PitchDetailsPage";
 import Login from "../pages/Login";
 import LandingPage from "../pages/LandingPage";
+import SignUp from "../pages/SignUp";
 import Team from "../pages/Team";
 import Messages from "../pages/Messages";
 import Analytics from "../pages/Analytics";
 import Settings from "../pages/Settings";
+import Collaborations from "../pages/Collaborations";
 import { AuthProvider } from "../context/AuthContext";
 
 export default function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation(); // <-- get current route
 
-  // Check if current route is /login
-  const hideLayout = location.pathname === "/login" || location.pathname === "/landing";
+  // Check if current route is /login or /signup or /landing
+  const hideLayout = location.pathname === "/login" || location.pathname === "/landing" || location.pathname === "/signup";
 
   useEffect(() => {
     const handleResize = () => {
@@ -64,6 +66,7 @@ export default function Main() {
               <Route path="/" element={<Navigate replace to="/landing" />} />
               <Route path="/landing" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/create" element={<NewPitch />} />
@@ -73,6 +76,7 @@ export default function Main() {
               <Route path="/messages" element={<Messages />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/collaborations" element={<Collaborations />} />
             </Routes>
           </main>
         </div>

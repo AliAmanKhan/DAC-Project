@@ -19,7 +19,7 @@ export default function LandingPage() {
             >
               Login
             </NavLink>
-            <NavLink href="/signup" className="btn-primary">
+            <NavLink to="/signup" className="btn-primary">
               Get Started
             </NavLink>
           </div>
@@ -38,11 +38,11 @@ export default function LandingPage() {
             together.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-            <NavLink href="/signup" className="btn-primary">
+            <NavLink to="/signup" className="btn-primary">
               Start Pitching Now
             </NavLink>
             <NavLink
-              href="/explore"
+              to="/explore"
               className="px-6 py-3 rounded-lg border border-border hover:bg-card transition-all duration-200"
             >
               Explore Pitches

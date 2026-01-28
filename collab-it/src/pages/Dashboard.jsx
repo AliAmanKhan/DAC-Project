@@ -64,9 +64,9 @@ export default function Dashboard() {
                   <Plus className="w-5 h-5 inline mr-2" />
                   Create a Pitch
                 </Link>
-                <button className="px-6 py-3 rounded-lg border border-border hover:bg-card transition-all duration-200">
+                <Link to="/collaborations" className="px-6 py-3 rounded-lg border border-border hover:bg-card transition-all duration-200">
                   My Collaborations
-                </button>
+                </Link>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
