@@ -1,0 +1,49 @@
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Run All Services",
+      "configurations": [
+        "Spring Boot Service",
+        "Node Auth Service",
+        "API Gateway",
+        "Frontend (Vite)"
+      ]
+    }
+  ],
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot Service",
+      "request": "launch",
+      "mainClass": "com.collabit.user.DemoApplication",
+      "projectName": "spring_boot_mvc_template",
+      "cwd": "${workspaceFolder}/Backend/Services/spring_boot_mvc_template"
+    },
+    {
+      "type": "node",
+      "name": "Node Auth Service",
+      "request": "launch",
+      "program": "${workspaceFolder}/Backend/Node-Auth/index.js",
+      "cwd": "${workspaceFolder}/Backend/Node-Auth"
+    },
+    {
+      "type": "node",
+      "name": "API Gateway",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "cwd": "${workspaceFolder}/Backend/API-Gateway",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "name": "Frontend (Vite)",
+      "request": "launch",
+      "program": "${workspaceFolder}/collab-it/node_modules/vite/bin/vite.js",
+      "args": ["dev"],
+      "cwd": "${workspaceFolder}/collab-it"
+    }
+  ]
+}
