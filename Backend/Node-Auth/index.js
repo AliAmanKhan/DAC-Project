@@ -7,7 +7,11 @@ app.use(bodyParser.json());
 
 app.use("/auth", authRouter);
 
-const PORT = 3000;
+app.use("/", (req, res) => {
+    res.send("Welcome to Node-Auth Service");
+});
+
+const PORT = 3050;
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`)
 })

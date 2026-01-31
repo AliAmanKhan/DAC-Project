@@ -4,7 +4,7 @@ const connection = db.createConnection({
     host: "localhost",
     user: "root",
     password: "root123",
-    database: "collabit"
+    database: "collabit_user"
 })
 
 connection.connect((err) => {
