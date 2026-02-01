@@ -4,7 +4,9 @@
     {
       "name": "Run All Services",
       "configurations": [
-        "Spring Boot Service",
+        "User Service",
+        "Pitch Service",
+        "Collaboration Service",
         "Node Auth Service",
         "API Gateway",
         "Frontend (Vite)"
@@ -14,11 +16,27 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Spring Boot Service",
+      "name": "User Service",
       "request": "launch",
       "mainClass": "com.collabit.user.DemoApplication",
-      "projectName": "spring_boot_mvc_template",
-      "cwd": "${workspaceFolder}/Backend/Services/spring_boot_mvc_template"
+      "projectName": "collabit_user",
+      "cwd": "${workspaceFolder}/Backend/Services/collabit_user"
+    },
+    {
+      "type": "java",
+      "name": "Pitch Service",
+      "request": "launch",
+      "mainClass": "com.collabit.pitch.Application",
+      "projectName": "collabit_pitch",
+      "cwd": "${workspaceFolder}/Backend/Services/collabit_pitch"
+    },
+    {
+      "type": "java",
+      "name": "Collaboration Service",
+      "request": "launch",
+      "mainClass": "com.collabit.collaboration.Application",
+      "projectName": "collabit_collaboration",
+      "cwd": "${workspaceFolder}/Backend/Services/collabit_collaboration"
     },
     {
       "type": "node",
