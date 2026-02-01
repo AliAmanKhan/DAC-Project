@@ -1,20 +1,25 @@
 package com.collabit.user.entity;
 
+import com.collabit.user.enums.SocialPlatform;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import lombok.Builder;
 
 @Entity
-@Table(name = "education")
+@Table(name = "social_links")
 @Getter @Setter
 @Builder
-public class Education {
+public class SocialLink {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,10 +27,9 @@ public class Education {
 
     private Long userId;
 
-    private String institute;
-    private String degree;
-    private String field;
-    private Integer startYear;
-    private Integer endYear;
-    private String description;
+    @Enumerated(EnumType.STRING)
+    private SocialPlatform platform;
+
+    private String url;
 }
+

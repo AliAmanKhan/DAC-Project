@@ -1,6 +1,8 @@
-package com.collabit.user.entity;
+package com.collaboration.entity;
 
-import com.collabit.user.enums.SocialPlatform;
+import java.time.LocalDateTime;
+
+import com.collaboration.enums.ProjectRole;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,23 +14,22 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import lombok.Builder;
-
 @Entity
-@Table(name = "social_links")
-@Getter @Setter
-@Builder
-public class SocialLink {
+@Table(name = "project_members")
+@Getter
+@Setter
+public class ProjectMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long pitchId;
+
     private Long userId;
 
     @Enumerated(EnumType.STRING)
-    private SocialPlatform platform;
+    private ProjectRole role;
 
-    private String url;
+    private LocalDateTime joinedAt;
 }
-
