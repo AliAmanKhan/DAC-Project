@@ -93,4 +93,26 @@ public class CollaborationServiceImpl implements CollaborationService {
     public List<CollaborationRequest> getRequestsForPitch(Long pitchId) {
         return requestRepo.findByPitchId(pitchId);
     }
+    
+    
+    @Override
+    public void withdrawRequest(Long userId, Long requestId) {
+
+        CollaborationRequest request = requestRepo.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        if (!request.getRequesterUserId().equals(userId)) {
+            throw new RuntimeException("You are not allowed to withdraw this request");
+        }
+
+        if (request.getStatus() != CollaborationStatus.REQUESTED) {
+            throw new RuntimeException("Request cannot be withdrawn");
+        }
+
+        request.setStatus(CollaborationStatus.WITHDRAWN);
+        request.setUpdatedAt(LocalDateTime.now());
+
+        requestRepo.save(request);
+    }
+
 }
