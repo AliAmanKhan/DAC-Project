@@ -15,4 +15,7 @@ public interface CollaborationService {
     List<ProjectMemberResponse> getProjectMembers(Long pitchId);
 
     List<CollaborationRequest> getRequestsForPitch(Long pitchId);
+    
+    void withdrawRequest(Long userId, Long requestId);
+
 }

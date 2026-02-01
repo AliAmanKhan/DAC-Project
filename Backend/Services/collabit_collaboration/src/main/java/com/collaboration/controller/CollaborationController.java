@@ -59,4 +59,14 @@ public class CollaborationController {
     ) {
         return ResponseEntity.ok(service.getProjectMembers(pitchId));
     }
+    
+    @PutMapping("/request/{id}/withdraw")
+    public ResponseEntity<Void> withdrawRequest(
+            @RequestHeader("X-USER-ID") Long userId,
+            @PathVariable Long id
+    ) {
+        service.withdrawRequest(userId, id);
+        return ResponseEntity.ok().build();
+    }
+
 }
