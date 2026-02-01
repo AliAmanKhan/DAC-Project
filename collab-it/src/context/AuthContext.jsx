@@ -1,31 +1,77 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState } from "react";
+import { authService } from "../services/authService";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // Set to true after login
-  const [user, setUser] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    avatar: "/placeholder.svg",
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    authService.isAuthenticated()
+  );
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const login = (userData) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-    localStorage.setItem("authToken", "token"); // Store token
+  const signup = async (username, password, dob) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await authService.signup(username, password, dob);
+      const userData = { username };
+      setUser(userData);
+      setIsAuthenticated(true);
+      localStorage.setItem("authToken", response.token);
+      localStorage.setItem("user", JSON.stringify(userData));
+      return response;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (username, password) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await authService.login(username, password);
+      const userData = { username };
+      setUser(userData);
+      setIsAuthenticated(true);
+      localStorage.setItem("authToken", response.token);
+      localStorage.setItem("user", JSON.stringify(userData));
+      return response;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = () => {
+    authService.logout();
     setIsAuthenticated(false);
     setUser(null);
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
+    setError(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        user,
+        login,
+        logout,
+        signup,
+        loading,
+        error,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -12,9 +12,12 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import lombok.Builder;
+
 @Entity
 @Table(name = "social_links")
 @Getter @Setter
+@Builder
 public class SocialLink {
 
     @Id

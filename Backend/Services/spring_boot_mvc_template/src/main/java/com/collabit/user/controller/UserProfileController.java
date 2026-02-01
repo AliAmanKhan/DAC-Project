@@ -54,6 +54,7 @@ public class UserProfileController {
             @PathVariable Long userId,
             @RequestHeader("X-USER-ID") Long viewerId
     ) {
+        // System.out.println("Fetching full profile for userId: " + userId + " viewed by: " + viewerId);
         return ResponseEntity.ok(
                 service.getFullProfile(userId, viewerId)
         );

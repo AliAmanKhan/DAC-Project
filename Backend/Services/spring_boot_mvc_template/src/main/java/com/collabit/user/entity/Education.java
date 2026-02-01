@@ -8,9 +8,12 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import lombok.Builder;
+
 @Entity
 @Table(name = "education")
 @Getter @Setter
+@Builder
 public class Education {
 
     @Id
