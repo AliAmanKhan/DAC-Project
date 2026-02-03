@@ -1,13 +1,12 @@
 const { createProxyMiddleware } = require("http-proxy-middleware");
-const { PITCH_SERVICE } = require("../config/services");
 const auth = require("../middlewares/auth.middleware");
 
 module.exports = (app) => {
   app.use(
-    "/pitches",
+    "/collaborations",
     auth,
     createProxyMiddleware({
-      target: "http://localhost:8081",
+      target: "http://localhost:8082",
       changeOrigin: true,
       onProxyReq: (proxyReq, req, res) => {
         if (req.user && req.user.id) {

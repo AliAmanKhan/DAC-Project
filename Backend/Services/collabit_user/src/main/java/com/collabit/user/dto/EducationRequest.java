@@ -11,4 +11,5 @@ public class EducationRequest {
     private String field;
     private Integer startYear;
     private Integer endYear;
+    private String description;
 }

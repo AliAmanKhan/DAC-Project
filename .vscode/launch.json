@@ -4,7 +4,7 @@
     {
       "name": "Run All Services",
       "configurations": [
-        "User Service",
+        // "User Service",
         "Pitch Service",
         "Collaboration Service",
         "Node Auth Service",
@@ -14,14 +14,13 @@
     }
   ],
   "configurations": [
-    {
-      "type": "java",
-      "name": "User Service",
-      "request": "launch",
-      "mainClass": "com.collabit.user.DemoApplication",
-      "projectName": "collabit_user",
-      "cwd": "${workspaceFolder}/Backend/Services/collabit_user"
-    },
+    // {
+    //   "type": "java",
+    //   "name": "User Service",
+    //   "request": "launch",
+    //   "mainClass": "com.collabit.user.DemoApplication",
+    //   "cwd": "${workspaceFolder}/Backend/Services/collabit_user"
+    // },
     {
       "type": "java",
       "name": "Pitch Service",
@@ -42,25 +41,39 @@
       "type": "node",
       "name": "Node Auth Service",
       "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "start"
+      ],
       "program": "${workspaceFolder}/Backend/Node-Auth/index.js",
-      "cwd": "${workspaceFolder}/Backend/Node-Auth"
+      "cwd": "${workspaceFolder}/Backend/Node-Auth",
+      "console": "integratedTerminal",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
     },
     {
-      "type": "node",
       "name": "API Gateway",
+      "type": "node",
       "request": "launch",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "start"],
-      "cwd": "${workspaceFolder}/Backend/API-Gateway",
+      "program": "${workspaceFolder}/Backend/API-Gateway/src/server.js",
+      "restart": true,
       "console": "integratedTerminal",
-      "skipFiles": ["<node_internals>/**"]
+      "cwd": "${workspaceFolder}/Backend/API-Gateway",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "3000"
+      }
     },
     {
       "type": "node",
       "name": "Frontend (Vite)",
       "request": "launch",
       "program": "${workspaceFolder}/collab-it/node_modules/vite/bin/vite.js",
-      "args": ["dev"],
+      "args": [
+        "dev"
+      ],
       "cwd": "${workspaceFolder}/collab-it"
     }
   ]

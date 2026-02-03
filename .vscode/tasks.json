@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "maven-package-collabit_user",
+      "type": "shell",
+      "command": "mvn -DskipTests package",
+      "problemMatcher": ["$maven"],
+      "options": {
+        "cwd": "${workspaceFolder}/Backend/Services/collabit_user"
+      }
+    }
+  ]
+}

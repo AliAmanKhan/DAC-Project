@@ -27,4 +27,7 @@ public class PitchCreateRequest {
     private String collaborators;
 
     private String tags;
+
+    // Base64 image string or URL (optional)
+    private String image;
 }

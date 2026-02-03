@@ -1,19 +1,33 @@
-const API_BASE_URL = "http://localhost:3000/api/auth";
+/* eslint-disable no-useless-catch */
+import { AUTH_SERVICE_URL } from "../config";
+const API_BASE_URL = `${AUTH_SERVICE_URL}/auth`; 
 
 export const authService = {
-  signup: async (username, password, dob) => {
-    // eslint-disable-next-line no-useless-catch
+  signup: async (formData) => {
     try {
+      const payload = {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        headline: formData.headline,
+        bio: formData.bio,
+        skills: formData.skills,
+        interests: formData.interests,
+        experience: formData.experience,
+        avatar: formData.avatar,
+      };
+
+      console.log("Signup Request URL:", `${API_BASE_URL}/signup`);
       const response = await fetch(`${API_BASE_URL}/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password, dob }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({}));
         throw new Error(error.message || "Signup failed");
       }
 
@@ -24,18 +38,18 @@ export const authService = {
     }
   },
 
-  login: async (username, password) => {
+  login: async (email, password) => {
     const response = await fetch(`${API_BASE_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email, password }),
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error || "Login failed");
+      const errBody = await response.json().catch(() => ({}));
+      throw new Error(errBody.message || "Login failed");
     }
 
     const data = await response.json();

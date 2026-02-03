@@ -61,4 +61,13 @@ public class PitchController {
     ) {
         return ResponseEntity.ok(service.getMyPitches(userId));
     }
+
+    @GetMapping("/recommended")
+    public ResponseEntity<List<PitchResponse>> getRecommendedPitches(
+            @RequestHeader("X-USER-ID") Long userId,
+            @RequestParam(required = false) List<String> interests,
+            @RequestParam(defaultValue = "10") Integer limit
+    ) {
+        return ResponseEntity.ok(service.getRecommendedPitches(userId, interests, limit));
+    }
 }
