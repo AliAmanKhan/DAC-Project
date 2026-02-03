@@ -17,12 +17,14 @@ export const pitchService = {
       if (token) headers["Authorization"] = `Bearer ${token}`;
       if (userId) headers["X-USER-ID"] = userId;
 
-      // Replace base64 image data with a default URL before sending to backend
-      const DEFAULT_IMAGE_URL = "https://via.placeholder.com/800x450?text=Pitch+Image";
       const payloadToSend = { ...pitchData };
+      
+      // If image is a URL (from S3), keep it; if it's base64, replace with placeholder
       if (payloadToSend.image && typeof payloadToSend.image === "string" && payloadToSend.image.startsWith("data:")) {
+        const DEFAULT_IMAGE_URL = "https://via.placeholder.com/800x450?text=Pitch+Image";
         payloadToSend.image = DEFAULT_IMAGE_URL;
       }
+      // If image is already a URL (from S3 upload), keep it as is
 
       const response = await fetch(API_BASE_URL, {
         method: "POST",
@@ -44,12 +46,14 @@ export const pitchService = {
     try {
       const token = authService.getToken();
 
-      // Replace base64 image data with a default URL before sending to backend
-      const DEFAULT_IMAGE_URL = "https://via.placeholder.com/800x450?text=Pitch+Image";
       const payloadToSend = { ...pitchData };
+      
+      // If image is a URL (from S3), keep it; if it's base64, replace with placeholder
       if (payloadToSend.image && typeof payloadToSend.image === "string" && payloadToSend.image.startsWith("data:")) {
+        const DEFAULT_IMAGE_URL = "https://via.placeholder.com/800x450?text=Pitch+Image";
         payloadToSend.image = DEFAULT_IMAGE_URL;
       }
+      // If image is already a URL (from S3 upload), keep it as is
 
       const response = await fetch(`${API_BASE_URL}/${pitchId}`, {
         method: "PUT",

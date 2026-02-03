@@ -1,4 +1,4 @@
-package com.collabit.user.service;
+package com.collabit.pitch.service;
 
 import java.time.Duration;
 
@@ -39,7 +39,7 @@ public class S3Service {
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key("profile-images/" + fileName)
+                .key("pitch-images/" + fileName)
                 .contentType("image/jpeg")
                 .build();
 

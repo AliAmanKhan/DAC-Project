@@ -1,4 +1,4 @@
-package com.collabit.user.config;
+package com.collabit.pitch.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

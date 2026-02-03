@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react"
 import { pitchService } from "../services/pitchService";
+import { s3Service } from "../services/s3Service";
 
 export default function NewCreatePitch() {
   const navigate = useNavigate();
@@ -51,6 +52,13 @@ export default function NewCreatePitch() {
 
     setLoading(true);
     try {
+      let imageUrl = null;
+
+      // Upload image to S3 if provided
+      if (formData.imageFile) {
+        imageUrl = await s3Service.uploadFile(formData.imageFile, "pitch");
+      }
+
       // Map frontend fields to backend PitchCreateRequest
       const payload = {
         title: formData.title,
@@ -60,7 +68,7 @@ export default function NewCreatePitch() {
         requiredSkills: formData.skills || "",
         collaborators: "",
         tags: formData.category || "",
-        image: formData.imagePreview || null,
+        image: imageUrl || null,
       };
 
       const created = await pitchService.createPitch(payload);
