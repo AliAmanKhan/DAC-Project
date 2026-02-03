@@ -218,8 +218,7 @@ public class CollaborationServiceImpl implements CollaborationService {
     public List<CollaborationNotificationDto> getAllNotifications() {
         List<CollaborationNotification> notifications = notificationRepo.findAll();
         return notifications.stream()
-                .map(this::toNotificationDto)
-                .toList();
+            .map(this::mapNotificationToDto)
+            .toList();
     }
-
 }

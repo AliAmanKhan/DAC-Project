@@ -18,9 +18,11 @@ import com.collabit.user.dto.UserProfileResponse;
 import com.collabit.user.dto.UserProfileUpdateRequest;
 import com.collabit.user.dto.UserSkillRequest;
 import com.collabit.user.service.UserProfileService;
+import com.collabit.user.service.S3Service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/users")
@@ -29,10 +31,6 @@ public class UserProfileController {
 
         private final UserProfileService service;
         private final S3Service s3Service;
-
-        public UserProfileController(S3Service s3Service) {
-                this.s3Service = s3Service;
-        }
 
         @GetMapping("/ping")
         public ResponseEntity<String> ping() {

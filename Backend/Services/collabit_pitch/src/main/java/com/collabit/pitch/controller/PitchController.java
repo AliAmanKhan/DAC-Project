@@ -9,6 +9,7 @@ import com.collabit.pitch.dto.PitchCreateRequest;
 import com.collabit.pitch.dto.PitchResponse;
 import com.collabit.pitch.dto.PitchUpdateRequest;
 import com.collabit.pitch.service.PitchService;
+import com.collabit.pitch.service.S3Service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class PitchController {
 
     private final PitchService service;
+    private final S3Service s3Service;
 
     @PostMapping
     public ResponseEntity<PitchResponse> createPitch(
@@ -69,5 +71,10 @@ public class PitchController {
             @RequestParam(defaultValue = "10") Integer limit
     ) {
         return ResponseEntity.ok(service.getRecommendedPitches(userId, interests, limit));
+    }
+
+    @GetMapping("/pitch-image/upload-url")
+    public String getUploadUrl(@RequestParam String fileName) {
+        return s3Service.generateUploadUrl(fileName);
     }
 }

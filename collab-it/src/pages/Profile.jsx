@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import image from "../assets/iacsd_logo.jpg";
 import { userService } from '../services/userService';
+import { s3Service } from '../services/s3Service';
 import { useAuth } from '../context/AuthContext';
 import AddEducationModal from '../components/AddEducationModal';
 
@@ -14,6 +15,8 @@ export default function Profile() {
   const [socialLinks, setSocialLinks] = useState([]);
   const [savingSocial, setSavingSocial] = useState(false);
   const [socialError, setSocialError] = useState(null);
+  const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
+  const [profileImageError, setProfileImageError] = useState(null);
 
   const fetchProfile = async () => {
     if (!isAuthenticated) return;
@@ -50,8 +53,46 @@ export default function Profile() {
   }, [isAuthenticated]);
 
   const avatarSeed = encodeURIComponent(profile?.username || profile?.fullName || 'guest');
-  const avatarUrl = profile?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`; 
-  return (
+  const avatarUrl = profile?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`;
+
+  const handleProfileImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingProfileImage(true);
+    setProfileImageError(null);
+
+    try {
+      // Upload to S3 and get URL
+      const s3Url = await s3Service.uploadFile(file, "profile");
+
+      // Update profile with new image URL
+      const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+      const userId = currentUser?.id || currentUser?.userId;
+
+      if (!userId) throw new Error("User ID not found");
+
+      await userService.updateMyProfile(userId, {
+        ...profile,
+        profileImage: s3Url,
+      });
+
+      // Update local state
+      setProfile((prev) => ({
+        ...prev,
+        profileImage: s3Url,
+      }));
+
+      // Update localStorage
+      const updatedUser = { ...currentUser, profileImage: s3Url };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } catch (err) {
+      setProfileImageError(err.message || "Failed to upload profile image");
+      console.error("Profile image upload error:", err);
+    } finally {
+      setUploadingProfileImage(false);
+    }
+  };
     <div className="min-h-screen flex justify-center items-start bg-slate-900 p-6">
       <div className="w-full max-w-2xl">
         {/* Sticky Header */}
@@ -62,12 +103,29 @@ export default function Profile() {
         {/* Profile Card */}
         <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg">
           {/* Profile Picture */}
-          <div className="flex justify-center mb-4">
-            <img
-              src={avatarUrl}
-              alt="Profile"
-              className="rounded-full w-32 h-32 border border-blue-500 shadow-md"
-            />
+          <div className="flex justify-center mb-4 relative">
+            <div className="relative group">
+              <img
+                src={avatarUrl}
+                alt="Profile"
+                className="rounded-full w-32 h-32 border border-blue-500 shadow-md object-cover cursor-pointer group-hover:opacity-75 transition"
+              />
+              <label className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition cursor-pointer">
+                <span className="text-white text-sm font-semibold">
+                  {uploadingProfileImage ? "Uploading..." : "Change"}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfileImageUpload}
+                  disabled={uploadingProfileImage}
+                  className="hidden"
+                />
+              </label>
+            </div>
+            {profileImageError && (
+              <div className="absolute top-32 text-red-400 text-sm">{profileImageError}</div>
+            )}
           </div>
 
           {/* User Info */}
