@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+
+  # =========================
+  # USER SERVICE DATABASE
+  # =========================
+  user-db:
+    image: mysql:8.0
+    container_name: collabit-user-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: collabit_user_db
+      MYSQL_USER: collabit_user
+      MYSQL_PASSWORD: collabit_user_pass
+    ports:
+      - "3306:3306"   # expose only if you want Workbench access
+    volumes:
+      - user_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+  # =========================
+  # PITCH SERVICE DATABASE
+  # =========================
+  pitch-db:
+    image: mysql:8.0
+    container_name: collabit-pitch-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: collabit_pitch_db
+      MYSQL_USER: collabit_pitch
+      MYSQL_PASSWORD: collabit_pitch_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - pitch_db_data:/var/lib/mysql
+
+
+  # =========================
+  # COLLABORATION SERVICE DATABASE
+  # =========================
+  collaboration-db:
+    image: mysql:8.0
+    container_name: collabit-collaboration-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: collabit_collaboration_db
+      MYSQL_USER: collabit_collab
+      MYSQL_PASSWORD: collabit_collab_pass
+    ports:
+      - "3308:3306"
+    volumes:
+      - collaboration_db_data:/var/lib/mysql
+
+
+volumes:
+  user_db_data:
+  pitch_db_data:
+  collaboration_db_data:

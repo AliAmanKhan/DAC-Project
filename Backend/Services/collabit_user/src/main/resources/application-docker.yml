@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:mysql://user-db:3306/collabit_user_db
+    username: collabit_user
+    password: collabit_user_pass
