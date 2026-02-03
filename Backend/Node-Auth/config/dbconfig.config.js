@@ -2,9 +2,10 @@ const db = require("mysql2");
 
 const connection = db.createConnection({
     host: "localhost",
-    user: "root",
-    password: "root123",
-    database: "collabit_user"
+    port: 3309,
+    user: "collabit_user",
+    password: "collabit_user_pass",
+    database: "collabit_user_db"
 })
 
 connection.connect((err) => {

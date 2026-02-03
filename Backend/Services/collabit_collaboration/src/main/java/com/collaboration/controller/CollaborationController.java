@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.collaboration.dto.CollaborationActionRequest;
+import com.collaboration.dto.CollaborationNotificationDto;
 import com.collaboration.dto.CollaborationRequestDto;
 import com.collaboration.dto.ProjectMemberResponse;
 import com.collaboration.entity.CollaborationRequest;
@@ -67,6 +68,35 @@ public class CollaborationController {
     ) {
         service.withdrawRequest(userId, id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/notifications/{userId}")
+    public ResponseEntity<List<CollaborationNotificationDto>> getNotifications(
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.ok(service.getNotificationsForPitchOwner(userId));
+    }
+
+    @GetMapping("/notifications/{userId}/unread")
+    public ResponseEntity<List<CollaborationNotificationDto>> getUnreadNotifications(
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.ok(service.getUnreadNotifications(userId));
+    }
+
+    @PutMapping("/notifications/{notificationId}/read")
+    public ResponseEntity<Void> markNotificationAsRead(
+            @RequestHeader("X-USER-ID") Long userId,
+            @PathVariable Long notificationId
+    ) {
+        service.markNotificationAsRead(notificationId, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    // Debug endpoint - get all notifications from database
+    @GetMapping("/debug/all-notifications")
+    public ResponseEntity<List<CollaborationNotificationDto>> getAllNotifications() {
+        return ResponseEntity.ok(service.getAllNotifications());
     }
 
 }

@@ -136,4 +136,33 @@ export const userService = {
       throw err;
     }
   },
+
+  getUserById: async (userId) => {
+    try {
+      if (!userId) throw new Error("User ID is required");
+
+      const token = authService.getToken();
+      const headers = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      // If possible, add current user as X-USER-ID
+      const stored = JSON.parse(localStorage.getItem("user") || "null");
+      const currentUserId = stored?.id || stored?.userId;
+      if (currentUserId) headers["X-USER-ID"] = currentUserId;
+
+      // Use the /full endpoint to get complete user profile
+      const response = await fetch(`${API_BASE_URL}/${userId}/full`, {
+        headers,
+      });
+
+      if (!response.ok) {
+        console.warn(`Failed to fetch user ${userId}:`, response.status);
+        return null; // Return null instead of throwing
+      }
+      return await response.json();
+    } catch (err) {
+      console.warn("Error fetching user details:", err);
+      return null; // Return null on error
+    }
+  },
 };
