@@ -3,16 +3,22 @@ import { useEffect, useState } from "react"
 import { ArrowLeft, Users, Award, MessageSquare, Share2, Zap } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import Navbar from "../components/Navbar"
+import CollaborationRequestModal from "../components/CollaborationRequestModal"
 import { pitchService } from "../services/pitchService"
+import { userService } from "../services/userService"
+import { useAuth } from "../context/AuthContext"
 
 export default function PitchDetailPage() {
   const { id } = useParams()
   const pitchId = Number.parseInt(id)
+  const { user } = useAuth()
   const [pitch, setPitch] = useState(null)
+  const [ownerDetails, setOwnerDetails] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [joined, setJoined] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
+  const [showRequestModal, setShowRequestModal] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -21,6 +27,12 @@ export default function PitchDetailPage() {
         setLoading(true)
         const data = await pitchService.getPitch(pitchId)
         if (mounted) setPitch(data)
+
+        // Fetch owner details separately
+        if (data?.ownerId) {
+          const ownerData = await userService.getUserById(data.ownerId)
+          if (mounted && ownerData) setOwnerDetails(ownerData)
+        }
       } catch (err) {
         if (mounted) setError(err?.message || "Failed to load pitch")
       } finally {
@@ -35,6 +47,9 @@ export default function PitchDetailPage() {
   if (error) return <div className="min-h-screen bg-background">{error}</div>
   if (!pitch) return <div className="min-h-screen bg-background">Pitch not found</div>
 
+  // Check if current user is the pitch owner
+  const isOwner = user && (user.id === pitch.ownerId || user.userId === pitch.ownerId)
+
   return (
     <div className="min-h-screen bg-background">
       {/* <Navbar /> */}
@@ -42,7 +57,7 @@ export default function PitchDetailPage() {
       {/* Header */}
       <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <Link href="/dashboard" className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4">
+          <Link to="/dashboard" className="flex items-center gap-2 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-5 h-5" />
             Back to Dashboard
           </Link>
@@ -114,6 +129,23 @@ export default function PitchDetailPage() {
                     <p className="text-lg font-semibold">
                       {(pitch.maxCollaborators ?? 0) - (pitch.collaborators ?? 0)}/{pitch.maxCollaborators ?? 0}
                     </p>
+                  </div>
+                </div>
+
+                {/* Owner Details */}
+                <div className="p-6 bg-card rounded-lg border border-border">
+                  <h3 className="text-xl font-bold mb-4">Project Owner</h3>
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={ownerDetails?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(ownerDetails?.fullName || pitch.createdBy || "owner")}`}
+                      alt={ownerDetails?.fullName || pitch.createdBy}
+                      className="w-16 h-16 rounded-full"
+                    />
+                    <div className="flex-1">
+                      <p className="font-bold text-lg">{ownerDetails?.fullName || pitch.createdBy}</p>
+                      <p className="text-sm text-muted-foreground">{ownerDetails?.email}</p>
+                      {ownerDetails?.bio && <p className="text-sm text-muted-foreground mt-1">{ownerDetails.bio}</p>}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -191,15 +223,26 @@ export default function PitchDetailPage() {
                 </div>
               </div>
 
-              {/* Action Button */}
-              <button
-                onClick={() => setJoined(!joined)}
-                className={`w-full py-3 rounded-lg font-semibold transition ${
-                  joined ? "bg-muted text-muted-foreground hover:bg-muted/80" : "btn-primary"
-                }`}
-              >
-                {joined ? "Joined!" : "Join This Pitch"}
-              </button>
+              {/* Action Button - Only show if user is NOT the owner */}
+              {!isOwner && (
+                <button
+                  onClick={() => setShowRequestModal(true)}
+                  className={`w-full py-3 rounded-lg font-semibold transition border-2 ${
+                    joined
+                      ? "bg-muted text-muted-foreground border-muted/50 hover:bg-muted/80"
+                      : "bg-emerald-500/10 text-emerald-500 border-emerald-500 hover:bg-emerald-500/20 hover:border-emerald-600"
+                  }`}
+                >
+                  {joined ? "Already Joined" : "Request to Join"}
+                </button>
+              )}
+              
+              {/* Message if user is owner */}
+              {isOwner && (
+                <div className="w-full py-3 px-4 rounded-lg bg-primary/10 border border-primary/20 text-center text-primary font-semibold">
+                  You are the owner of this pitch
+                </div>
+              )}
 
               {/* Share */}
               <div className="flex gap-2">
@@ -215,6 +258,15 @@ export default function PitchDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Request Modal */}
+        {showRequestModal && (
+          <CollaborationRequestModal
+            pitchId={pitchId}
+            onClose={() => setShowRequestModal(false)}
+            onSuccess={() => setJoined(true)}
+          />
+        )}
       </div>
     </div>
   )

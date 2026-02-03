@@ -1,6 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
+import { Bell } from "lucide-react";
+import { useState } from "react";
 import ProfileSidebar from "./ProfileSidebar";
+import NotificationsPanel from "./NotificationsPanel";
 import { useAuth } from "../context/AuthContext";
 
 export default function Header({ setIsSidebarOpen }) {
@@ -10,6 +13,7 @@ export default function Header({ setIsSidebarOpen }) {
   };
 
   const { user } = useAuth();
+  const [showNotifications, setShowNotifications] = useState(false);
   const avatarSeed = encodeURIComponent(user?.username || user?.fullName || "guest");
   const avatarUrl = user?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`;
 
@@ -52,6 +56,17 @@ export default function Header({ setIsSidebarOpen }) {
             +
           </div>
           <Tooltip id="my-tooltip" />
+          
+          {/* Notification Bell */}
+          {user && (
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="p-2 hover:bg-slate-800 rounded-lg transition relative text-white"
+            >
+              <Bell className="w-5 h-5" />
+            </button>
+          )}
+
           <div className="text-right">
             <p className="text-sm font-medium text-white">{user?.fullName || user?.username || "Guest"}</p>
             <p className="text-xs text-slate-400">{user?.email || "Member"}</p>
@@ -60,6 +75,9 @@ export default function Header({ setIsSidebarOpen }) {
           <ProfileSidebar />
         </div>
       </div>
+
+      {/* Notifications Panel */}
+      {user && <NotificationsPanel userId={user?.id || user?.userId} isOpen={showNotifications} onClose={() => setShowNotifications(false)} />}
     </header>
   );
 }

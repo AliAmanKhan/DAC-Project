@@ -21,4 +21,12 @@ public class PitchResponse {
     private String tags;
     private String image;
     private Long ownerId;
+    
+    // Owner Details
+    private Long ownerIdField;
+    private String createdBy;
+    private String ownerEmail;
+    private String ownerBio;
+    private String ownerAvatar;
 }
+

@@ -78,17 +78,17 @@ export default function Dashboard() {
       return () => (mounted = false);
     }, [user]);
 
-    const list = loading ? [] : recommended.length > 0 ? recommended : initial.slice(0, 2);
-
     if (loading) {
       return <div className="text-muted-foreground">Loading recommendations...</div>;
     }
     if (error) {
       return <div className="text-red-400">{error}</div>;
     }
-    if (list.length === 0) {
-      return <div className="text-muted-foreground">No recommendations yet. Update your interests to get personalized suggestions.</div>;
+    if (recommended.length === 0) {
+      return <div className="text-muted-foreground text-lg">There are no pitches</div>;
     }
+
+    const list = recommended;
 
     return (
       <>
@@ -126,7 +126,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <Link
-                    href={viewUrl}
+                    to={viewUrl}
                     className="px-4 py-2 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition"
                   >
                     View
@@ -155,7 +155,7 @@ export default function Dashboard() {
                 Explore amazing projects to collaborate on and earn rewards
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link href="/create-pitch" className="btn-primary">
+                <Link to="/create-pitch" className="btn-primary">
                   <Plus className="w-5 h-5 inline mr-2" />
                   Create a Pitch
                 </Link>

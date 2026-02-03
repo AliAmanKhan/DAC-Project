@@ -15,7 +15,7 @@ services:
       MYSQL_USER: collabit_user
       MYSQL_PASSWORD: collabit_user_pass
     ports:
-      - "3306:3306"   # expose only if you want Workbench access
+      - "3309:3306"   # changed host port to 3309 to avoid local mysql conflict
     volumes:
       - user_db_data:/var/lib/mysql
     healthcheck:
