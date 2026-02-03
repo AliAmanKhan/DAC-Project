@@ -29,13 +29,18 @@ public class UserProfileController {
 
     private final UserProfileService service;
 
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
+    }
+
     @PutMapping("/me")
     public ResponseEntity<UserProfileResponse> updateMyProfile(
             @RequestHeader("X-USER-ID") Long userId,
             @Valid @RequestBody UserProfileUpdateRequest request
     ) {
+        System.out.println("UserProfileController: updateMyProfile called for userId: " + userId);
         return ResponseEntity.ok(
-                
                 service.updateProfile(userId, request)
         );
     }
@@ -88,10 +93,5 @@ public class UserProfileController {
         service.updateEducation(userId, request);
         return ResponseEntity.ok().build();
     }
-
-    
-    
-    
-    
 }
 

@@ -52,6 +52,9 @@ public class Pitch {
     @Column(length = 500)
     private String tags;
 
+    @Column(length = 2000)
+    private String image;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

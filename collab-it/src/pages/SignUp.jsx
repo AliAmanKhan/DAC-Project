@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, signup, loading, error } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -121,11 +121,15 @@ export default function SignUp() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateStep2()) {
-      login(formData);
+    if (!validateStep2()) return;
+
+    try {
+      await signup(formData);
       navigate("/dashboard");
+    } catch (err) {
+      setErrors((prev) => ({ ...prev, form: err.message }));
     }
   };
 
@@ -458,19 +462,25 @@ export default function SignUp() {
                   </div>
                 </div>
 
+                { (errors.form || error) && (
+                  <p className="text-red-400 text-sm mb-2">{errors.form || error}</p>
+                ) }
+
                 <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => setCurrentStep(2)}
                     className="flex-1 px-6 py-3 rounded-lg border border-slate-700 text-white hover:bg-slate-800 transition font-semibold"
+                    disabled={loading}
                   >
                     Back
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 transition font-semibold"
+                    className="flex-1 px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 transition font-semibold disabled:opacity-60"
+                    disabled={loading}
                   >
-                    Create Account
+                    {loading ? "Creating..." : "Create Account"}
                   </button>
                 </div>
               </form>

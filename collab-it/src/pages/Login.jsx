@@ -1,20 +1,38 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Zap } from "lucide-react"
+import { Zap } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    // simple client validation
+    if (!email || !password) {
+      setError("Please enter both email and password");
+      return;
+    }
+
     setIsLoading(true);
-    // Simulate login
-    setTimeout(() => {
+    setError(null);
+    try {
+      await login(email, password);
       navigate("/dashboard");
-    }, 1000);
+    } catch (err) {
+      const msg = err?.message || "Login failed. Please try again.";
+      setError(msg);
+      console.error("Login failed", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -60,12 +78,18 @@ export default function Login() {
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </button>
+
+            {error && (
+              <p role="alert" aria-live="assertive" className="text-red-400 text-sm mt-3">
+                {error}
+              </p>
+            )}
           </form>
 
           <p className="text-center text-muted-foreground mt-6">
             Don't have an account?{" "}
             <Link
-              href="/signup"
+              to="/signup"
               className="text-primary hover:underline font-semibold"
             >
               Sign up

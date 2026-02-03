@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react"
+import { pitchService } from "../services/pitchService";
 
 export default function NewCreatePitch() {
   const navigate = useNavigate();
@@ -11,6 +12,8 @@ export default function NewCreatePitch() {
     skills: "",
     timeline: "3 months",
     maxCollaborators: 5,
+    imageFile: null,
+    imagePreview: null,
   });
 
   const handleChange = (e) => {
@@ -18,10 +21,61 @@ export default function NewCreatePitch() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleImageChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    // basic validation
+    if (!file.type.startsWith("image/")) {
+      setError("Please select an image file");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setFormData((prev) => ({ ...prev, imageFile: file, imagePreview: reader.result }));
+    };
+    reader.readAsDataURL(file); // base64
+  };
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle pitch creation
-    navigate("/dashboard");
+    setError(null);
+    if (!formData.title.trim() || !formData.description.trim()) {
+      setError("Title and description are required");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Map frontend fields to backend PitchCreateRequest
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        visibility: "PUBLIC", // or allow user selection later
+        requiredCollaborators: parseInt(formData.maxCollaborators, 10) || 1,
+        requiredSkills: formData.skills || "",
+        collaborators: "",
+        tags: formData.category || "",
+        image: formData.imagePreview || null,
+      };
+
+      const created = await pitchService.createPitch(payload);
+      // navigate to pitch detail page using returned pitchId
+      const pitchId = created?.pitchId || created?.id;
+      if (pitchId) {
+        navigate(`/pitch/${pitchId}`);
+      } else {
+        navigate('/pitches');
+      }
+    } catch (err) {
+      setError(err?.message || "Failed to create pitch");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -75,6 +129,17 @@ export default function NewCreatePitch() {
                 rows={6}
                 className="w-full px-4 py-3 rounded-lg bg-input border border-border focus:ring-2 focus:ring-primary outline-none transition resize-none"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2">Showcase Image</label>
+              <input type="file" accept="image/*" onChange={handleImageChange} className="w-full" />
+              {formData.imagePreview && (
+                <div className="mt-3">
+                  <p className="text-sm text-muted-foreground mb-2">Preview:</p>
+                  <img src={formData.imagePreview} alt="Preview" className="max-h-48 rounded shadow" />
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -150,9 +215,10 @@ export default function NewCreatePitch() {
           </div>
 
           {/* Actions */}
+          {error && <p className="text-sm text-red-400">{error}</p>}
           <div className="flex gap-4">
-            <button type="submit" className="btn-primary">
-              Launch Pitch
+            <button type="submit" disabled={loading} className="btn-primary disabled:opacity-60 disabled:cursor-not-allowed">
+              {loading ? 'Launching...' : 'Launch Pitch'}
             </button>
             <Link
               href="/dashboard"

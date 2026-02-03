@@ -19,5 +19,6 @@ public class PitchResponse {
     private String requiredSkills;
     private String collaborators;
     private String tags;
+    private String image;
     private Long ownerId;
 }

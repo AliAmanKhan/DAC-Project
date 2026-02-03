@@ -1,12 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
 import ProfileSidebar from "./ProfileSidebar";
+import { useAuth } from "../context/AuthContext";
 
 export default function Header({ setIsSidebarOpen }) {
   const navigation = useNavigate();
   const navigate = (loc) => {
     navigation(loc);
   };
+
+  const { user } = useAuth();
+  const avatarSeed = encodeURIComponent(user?.username || user?.fullName || "guest");
+  const avatarUrl = user?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`;
+
   return (
     <header className="sticky top-0 z-30 h-16 bg-slate-900 border-b border-slate-700 px-6 flex items-center justify-between">
       {/* Mobile Menu Button */}
@@ -47,14 +53,10 @@ export default function Header({ setIsSidebarOpen }) {
           </div>
           <Tooltip id="my-tooltip" />
           <div className="text-right">
-            <p className="text-sm font-medium text-white">John Doe</p>
-            <p className="text-xs text-slate-400">Admin</p>
+            <p className="text-sm font-medium text-white">{user?.fullName || user?.username || "Guest"}</p>
+            <p className="text-xs text-slate-400">{user?.email || "Member"}</p>
           </div>
-          {/* <img
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=John"
-            alt="User"
-            className="w-10 h-10 rounded-full"
-          /> */}
+
           <ProfileSidebar />
         </div>
       </div>

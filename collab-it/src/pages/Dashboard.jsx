@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, Zap, BookOpen, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import RewardCard from "../components/RewardCard";
 import PitchCard from "../components/PitchCard";
+import { useAuth } from "../context/AuthContext";
+import { pitchService } from "../services/pitchService";
 
 export default function Dashboard() {
   const [pitches] = useState([
@@ -44,6 +46,99 @@ export default function Dashboard() {
       image: "/learning-platform-community.jpg",
     },
   ]);
+
+  // Helper component placed inline for clarity (declared inside component scope)
+  function RecommendedList({ pitches = [] }) {
+    const initial = pitches;
+    const { user } = useAuth();
+    const [recommended, setRecommended] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+      let mounted = true;
+      const fetchRecommended = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const interests = user?.interests || [];
+          const results = await pitchService.getRecommendedPitches(interests, 6);
+          if (!mounted) return;
+          setRecommended(results || []);
+        } catch (err) {
+          if (!mounted) return;
+          setError(err.message || "Failed to load recommendations");
+          setRecommended([]);
+        } finally {
+          if (mounted) setLoading(false);
+        }
+      };
+
+      fetchRecommended();
+      return () => (mounted = false);
+    }, [user]);
+
+    const list = loading ? [] : recommended.length > 0 ? recommended : initial.slice(0, 2);
+
+    if (loading) {
+      return <div className="text-muted-foreground">Loading recommendations...</div>;
+    }
+    if (error) {
+      return <div className="text-red-400">{error}</div>;
+    }
+    if (list.length === 0) {
+      return <div className="text-muted-foreground">No recommendations yet. Update your interests to get personalized suggestions.</div>;
+    }
+
+    return (
+      <>
+        {list.map((pitch) => {
+          // map backend fields to UI-friendly props
+          const title = pitch.title || pitch.name;
+          const description = pitch.description || "";
+          const image = pitch.image || "/placeholder.svg";
+          const tags = pitch.tags || "";
+          const category = (tags && tags.split(",")[0]) || "General";
+          const collaborators = pitch.requiredCollaborators ?? "—";
+          const viewUrl = `/pitch/${pitch.pitchId ?? pitch.id}`;
+
+          return (
+            <div
+              key={pitch.pitchId ?? pitch.id}
+              className="p-6 rounded-lg bg-card border border-border card-hover"
+            >
+              <img
+                src={image}
+                alt={title}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
+              <div className="space-y-3">
+                <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-primary/20 text-primary">
+                  {category}
+                </span>
+                <h3 className="text-xl font-bold">{title}</h3>
+                <p className="text-muted-foreground">{description}</p>
+                <div className="flex items-center justify-between pt-4 border-t border-border">
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground">Collaborators</p>
+                      <p className="font-bold text-primary">{collaborators}</p>
+                    </div>
+                  </div>
+                  <Link
+                    href={viewUrl}
+                    className="px-4 py-2 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </>
+    );
+  }
   return (
     <div className="min-h-screen bg-background">
       {/* <Navbar /> */}
@@ -105,51 +200,13 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {pitches.slice(0, 2).map((pitch) => (
-            <div
-              key={pitch.id}
-              className="p-6 rounded-lg bg-card border border-border card-hover"
-            >
-              <img
-                src={pitch.image || "/placeholder.svg"}
-                alt={pitch.title}
-                className="w-full h-48 object-cover rounded-lg mb-4"
-              />
-              <div className="space-y-3">
-                <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-primary/20 text-primary">
-                  {pitch.category}
-                </span>
-                <h3 className="text-xl font-bold">{pitch.title}</h3>
-                <p className="text-muted-foreground">{pitch.description}</p>
-                <div className="flex items-center justify-between pt-4 border-t border-border">
-                  <div className="flex items-center gap-4">
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground">
-                        Collaborators
-                      </p>
-                      <p className="font-bold text-primary">
-                        {pitch.collaborators}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Reward</p>
-                      <p className="font-bold text-accent">
-                        {pitch.reward.credits} pts
-                      </p>
-                    </div>
-                  </div>
-                  <Link
-                    href={`/pitch/${pitch.id}`}
-                    className="px-4 py-2 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition"
-                  >
-                    View
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
+          {/* Recommended pitches fetched from API */}
+          {/** Loading / Error / Empty states handled below **/}
+          <RecommendedList pitches={pitches /* fallback until fetched */} />
         </div>
       </section>
     </div>
   );
 }
+
+

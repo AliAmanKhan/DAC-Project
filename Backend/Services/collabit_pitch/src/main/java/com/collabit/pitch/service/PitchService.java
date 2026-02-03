@@ -17,4 +17,6 @@ public interface PitchService {
     PitchResponse getPitch(Long pitchId);
 
     List<PitchResponse> getMyPitches(Long userId);
-}
+
+    List<PitchResponse> getRecommendedPitches(Long userId, List<String> interests, Integer limit);
+} 

@@ -7,6 +7,7 @@ import Projects from "../pages/Projects";
 import NewPitch from "../pages/NewPitch";
 import Profile from "../pages/Profile";
 import PitchDetailPage from "../pages/PitchDetailsPage";
+import MyPitches from "../pages/MyPitches";
 import Login from "../pages/Login";
 import LandingPage from "../pages/LandingPage";
 import SignUp from "../pages/SignUp";
@@ -71,7 +72,8 @@ export default function Main() {
               <Route path="/projects" element={<Projects />} />
               <Route path="/create" element={<NewPitch />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/pitches" element={<PitchDetailPage />} />
+              <Route path="/pitches" element={<MyPitches />} />
+              <Route path="/pitch/:id" element={<PitchDetailPage />} />
               <Route path="/team" element={<Team />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/analytics" element={<Analytics />} />

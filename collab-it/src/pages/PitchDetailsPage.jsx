@@ -1,50 +1,39 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ArrowLeft, Users, Award, MessageSquare, Share2, Zap } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import Navbar from "../components/Navbar"
-
-const PITCH_DATA = {
-  1: {
-    id: 1,
-    title: "AI-Powered Note Taking App",
-    description:
-      "A revolutionary note-taking application that uses artificial intelligence to automatically summarize, tag, and organize your notes. Perfect for students and professionals.",
-    category: "Web App",
-    status: "Active",
-    createdBy: "Sarah Chen",
-    collaborators: 3,
-    maxCollaborators: 8,
-    reward: { credits: 500, courses: 2 },
-    image: "/ai-note-taking-app-interface.jpg",
-    requirements: ["React Developer", "Backend Engineer", "UI/UX Designer"],
-    timeline: "3-4 months",
-    description_full: `This is an exciting opportunity to build the future of note-taking. We're looking for talented developers and designers who want to create an AI-powered app that helps millions of users organize their thoughts better.
-
-The app will feature:
-- Smart AI summarization
-- Automatic tagging and categorization
-- Real-time collaboration
-- Cross-platform sync
-- Advanced search capabilities`,
-    collaboratorsList: [
-      { id: 1, name: "Alex Johnson", role: "Frontend Developer", avatar: "/diverse-avatars.png" },
-      { id: 2, name: "Maria Garcia", role: "Backend Developer", avatar: "/diverse-avatars.png" },
-      { id: 3, name: "James Wilson", role: "UI Designer", avatar: "/diverse-avatars.png" },
-    ],
-  },
-}
+import { pitchService } from "../services/pitchService"
 
 export default function PitchDetailPage() {
-  const params = useParams()
-  const pitchId = Number.parseInt(params.id)
-  const pitch = PITCH_DATA[1]
+  const { id } = useParams()
+  const pitchId = Number.parseInt(id)
+  const [pitch, setPitch] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [joined, setJoined] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
 
-  if (!pitch) {
-    return <div className="min-h-screen bg-background">Pitch not found</div>
-  }
+  useEffect(() => {
+    let mounted = true
+    const fetchPitch = async () => {
+      try {
+        setLoading(true)
+        const data = await pitchService.getPitch(pitchId)
+        if (mounted) setPitch(data)
+      } catch (err) {
+        if (mounted) setError(err?.message || "Failed to load pitch")
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    if (!isNaN(pitchId)) fetchPitch()
+    return () => { mounted = false }
+  }, [pitchId])
+
+  if (loading) return <div className="min-h-screen bg-background">Loading...</div>
+  if (error) return <div className="min-h-screen bg-background">{error}</div>
+  if (!pitch) return <div className="min-h-screen bg-background">Pitch not found</div>
 
   return (
     <div className="min-h-screen bg-background">
@@ -123,7 +112,7 @@ export default function PitchDetailPage() {
                   <div>
                     <p className="text-sm text-muted-foreground">Spots Available</p>
                     <p className="text-lg font-semibold">
-                      {pitch.maxCollaborators - pitch.collaborators}/{pitch.maxCollaborators}
+                      {(pitch.maxCollaborators ?? 0) - (pitch.collaborators ?? 0)}/{pitch.maxCollaborators ?? 0}
                     </p>
                   </div>
                 </div>
@@ -133,7 +122,7 @@ export default function PitchDetailPage() {
             {activeTab === "collaborators" && (
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold">Current Team Members</h2>
-                {pitch.collaboratorsList.map((collab) => (
+                {(pitch.collaboratorsList ?? []).map((collab) => (
                   <div key={collab.id} className="p-4 bg-card rounded-lg border border-border flex items-center gap-4">
                     <img
                       src={collab.avatar || "/placeholder.svg"}
@@ -152,7 +141,7 @@ export default function PitchDetailPage() {
             {activeTab === "requirements" && (
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold">Needed Skills</h2>
-                {pitch.requirements.map((req, idx) => (
+                {(pitch.requirements ?? []).map((req, idx) => (
                   <div key={idx} className="p-4 bg-card rounded-lg border border-border flex items-center gap-3">
                     <Zap className="w-5 h-5 text-primary" />
                     <span className="font-medium">{req}</span>
@@ -174,11 +163,11 @@ export default function PitchDetailPage() {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Credits</span>
-                    <span className="font-bold text-primary">{pitch.reward.credits} pts</span>
+                    <span className="font-bold text-primary">{pitch.reward?.credits ?? 0} pts</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Courses</span>
-                    <span className="font-bold text-accent">{pitch.reward.courses} unlocked</span>
+                    <span className="font-bold text-accent">{pitch.reward?.courses ?? 0} unlocked</span>
                   </div>
                 </div>
               </div>
@@ -191,13 +180,13 @@ export default function PitchDetailPage() {
                     <span className="text-muted-foreground">Team</span>
                   </div>
                   <span className="font-bold">
-                    {pitch.collaborators}/{pitch.maxCollaborators}
+                    {pitch.collaborators ?? 0}/{pitch.maxCollaborators ?? 0}
                   </span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
                   <div
                     className="bg-gradient-accent h-2 rounded-full transition-all"
-                    style={{ width: `${(pitch.collaborators / pitch.maxCollaborators) * 100}%` }}
+                    style={{ width: `${pitch.maxCollaborators ? ((pitch.collaborators ?? 0) / pitch.maxCollaborators) * 100 : 0}%` }}
                   />
                 </div>
               </div>

@@ -18,6 +18,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+
 @Entity
 @Table(name = "user_profiles")
 @Getter
@@ -28,6 +32,7 @@ import lombok.Setter;
 public class UserProfile {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId; // comes from Auth service
 
     @Column(nullable = false)
@@ -38,6 +43,10 @@ public class UserProfile {
 
     @Column(nullable = false)
     private String email;
+
+    @JsonIgnore
+    @Column(nullable = false)
+    private String password;
 
     private String bio;
 

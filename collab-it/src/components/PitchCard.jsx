@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export default function PitchCard({ pitch }) {
   return (
-    <Link href={`/pitch/${pitch.id}`}>
+    <Link to={`/pitch/${pitch.id}`}>
       <div className="p-4 bg-card rounded-lg border border-border card-hover cursor-pointer h-full flex flex-col">
         <img
           src={pitch.image || "/placeholder.svg"}

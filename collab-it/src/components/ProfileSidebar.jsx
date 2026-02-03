@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function ProfileSidebar() {
+  const { user, isAuthenticated } = useAuth();
+  const avatarSeed = encodeURIComponent(user?.username || user?.fullName || "guest");
+  const avatarUrl = user?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`; 
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(
@@ -51,11 +55,11 @@ export default function ProfileSidebar() {
         className="flex items-center gap-2 rounded-full border border-slate-600 px-2 py-1 hover:bg-slate-800 transition"
       >
         <img
-          src="https://api.dicebear.com/7.x/avataaars/svg?seed=John"
-          alt="User"
+          src={avatarUrl}
+          alt={user?.fullName || user?.username || 'User'}
           className="w-8 h-8 rounded-full"
         />
-        <span className="hidden sm:inline text-sm text-slate-200">Profile</span>
+        <span className="hidden sm:inline text-sm text-slate-200">{user?.fullName || user?.username || 'Profile'}</span>
       </button>
 
       {/* Sliding sidebar + overlay (desktop/tablet only) */}
@@ -78,13 +82,13 @@ export default function ProfileSidebar() {
             <div className="flex items-center justify-between px-4 py-4 border-b border-slate-700">
               <div className="flex items-center gap-3">
                 <img
-                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=John"
-                  alt="User"
+                  src={avatarUrl}
+                  alt={user?.fullName || user?.username || 'User'}
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
-                  <p className="text-sm font-semibold text-white">John Doe</p>
-                  <p className="text-xs text-slate-400">Admin</p>
+                  <p className="text-sm font-semibold text-white">{user?.fullName || user?.username || 'Guest'}</p>
+                  <p className="text-xs text-slate-400">{user?.email || 'Member'}</p>
                 </div>
               </div>
               <button
