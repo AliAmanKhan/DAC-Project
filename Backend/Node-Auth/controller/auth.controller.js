@@ -2,6 +2,8 @@ const connection = require("../config/dbconfig.config");
 const bcrypt = require("bcrypt");
 const SECRET_KEY = process.env.SECRET_KEY || "jwt-secret";
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const { sendPasswordResetEmail } = require("../services/email.service");
 
 // Helper to run queries with promises
 const query = (sql, params) => connection.promise().query(sql, params);
@@ -112,3 +114,104 @@ exports.logout = (req, res) => {
   // For stateless JWT, logout is handled on client by removing token.
   return res.status(200).json({ message: "Logged out" });
 };
+
+// Forgot Password - Send reset email
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    // Check if user exists
+    const [rows] = await query("SELECT user_id, full_name, email FROM user_profiles WHERE email = ?", [email]);
+    
+    if (rows.length === 0) {
+      // For security, don't reveal if email exists or not
+      return res.status(200).json({ 
+        message: "If an account with that email exists, a password reset link has been sent." 
+      });
+    }
+
+    const user = rows[0];
+
+    // Generate secure reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    
+    // Token expires in 1 hour
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    // Store token in database (you need to create this table first)
+    // We'll store it in the user_profiles table with new columns
+    await query(
+      "UPDATE user_profiles SET reset_token = ?, reset_token_expires = ? WHERE user_id = ?",
+      [hashedToken, expiresAt, user.user_id]
+    );
+
+    // Send email with reset token
+    try {
+      await sendPasswordResetEmail(user.email, resetToken, user.full_name);
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError);
+      // Continue anyway - token is saved
+    }
+
+    return res.status(200).json({ 
+      message: "If an account with that email exists, a password reset link has been sent.",
+      // In development, also return the token for testing
+      ...(process.env.NODE_ENV === 'development' && { resetToken })
+    });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Reset Password - Validate token and update password
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ message: "Token and new password are required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters long" });
+    }
+
+    // Hash the token to compare with stored hash
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with valid token
+    const [rows] = await query(
+      "SELECT user_id, full_name FROM user_profiles WHERE reset_token = ? AND reset_token_expires > NOW()",
+      [hashedToken]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ message: "Invalid or expired reset token" });
+    }
+
+    const user = rows[0];
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password and clear reset token
+    await query(
+      "UPDATE user_profiles SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE user_id = ?",
+      [hashedPassword, user.user_id]
+    );
+
+    return res.status(200).json({ 
+      message: "Password has been reset successfully. You can now login with your new password." 
+    });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+

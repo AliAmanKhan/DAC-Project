@@ -93,6 +93,8 @@ export default function Profile() {
       setUploadingProfileImage(false);
     }
   };
+
+  return (
     <div className="min-h-screen flex justify-center items-start bg-slate-900 p-6">
       <div className="w-full max-w-2xl">
         {/* Sticky Header */}

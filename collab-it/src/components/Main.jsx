@@ -11,6 +11,8 @@ import MyPitches from "../pages/MyPitches";
 import Login from "../pages/Login";
 import LandingPage from "../pages/LandingPage";
 import SignUp from "../pages/SignUp";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
 import Team from "../pages/Team";
 import Messages from "../pages/Messages";
 import Analytics from "../pages/Analytics";
@@ -22,8 +24,8 @@ export default function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation(); // <-- get current route
 
-  // Check if current route is /login or /signup or /landing
-  const hideLayout = location.pathname === "/login" || location.pathname === "/landing" || location.pathname === "/signup";
+  // Check if current route is /login or /signup or /landing or password reset pages
+  const hideLayout = location.pathname === "/login" || location.pathname === "/landing" || location.pathname === "/signup" || location.pathname === "/forgot-password" || location.pathname === "/reset-password";
 
   useEffect(() => {
     const handleResize = () => {
@@ -68,6 +70,8 @@ export default function Main() {
               <Route path="/landing" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/create" element={<NewPitch />} />
