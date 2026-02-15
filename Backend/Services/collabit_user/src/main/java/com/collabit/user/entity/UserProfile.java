@@ -44,6 +44,8 @@ public class UserProfile {
     @Column(nullable = false)
     private String email;
 
+    private String phone;
+
     @JsonIgnore
     @Column(nullable = false)
     private String password;

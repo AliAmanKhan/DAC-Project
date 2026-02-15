@@ -88,7 +88,8 @@ public class UserProfileController {
         }
 
         @GetMapping("/profile-image/upload-url")
-        public String getUploadUrl(@RequestParam String fileName) {
-                return s3Service.generateUploadUrl(fileName);
+        public String getUploadUrl(@RequestParam String fileName,
+                        @RequestParam(defaultValue = "image/jpeg") String contentType) {
+                return s3Service.generateUploadUrl(fileName, contentType);
         }
 }

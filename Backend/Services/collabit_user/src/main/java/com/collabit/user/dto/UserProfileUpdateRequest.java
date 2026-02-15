@@ -19,6 +19,8 @@ public class UserProfileUpdateRequest {
 
     private String bio;
 
+    private String phone;
+
     private LocalDate dob;
 
     private Gender gender;
@@ -32,4 +34,3 @@ public class UserProfileUpdateRequest {
     @NotNull
     private ProfileVisibility visibility;
 }
-

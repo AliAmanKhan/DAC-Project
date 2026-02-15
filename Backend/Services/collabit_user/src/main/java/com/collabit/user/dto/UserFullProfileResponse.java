@@ -17,7 +17,10 @@ public class UserFullProfileResponse {
     private Long userId;
     private String fullName;
     private String username;
+    private String email;
+    private String phone;
     private String bio;
+    private String profileImage;
     private String college;
     private String branch;
     private Integer graduationYear;
@@ -30,4 +33,3 @@ public class UserFullProfileResponse {
     private UserStatsResponse stats;
     private List<String> badges;
 }
-

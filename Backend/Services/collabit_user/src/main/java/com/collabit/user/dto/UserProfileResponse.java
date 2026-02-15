@@ -15,6 +15,7 @@ public class UserProfileResponse {
     private String fullName;
     private String username;
     private String email;
+    private String phone;
     private String bio;
     private String profileImage;
     private String college;
@@ -22,4 +23,3 @@ public class UserProfileResponse {
     private Integer graduationYear;
     private ProfileVisibility visibility;
 }
-
