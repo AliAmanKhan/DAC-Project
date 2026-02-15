@@ -1,19 +1,19 @@
 const mysql = require("mysql2");
 require("dotenv").config();
 
-// Create connection pool instead of single connection
-// Pool automatically handles reconnections and manages multiple connections
+// Create connection pool using connection string
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    uri: process.env.DATABASE_URL,   // <-- single connection string
     waitForConnections: true,
-    connectionLimit: 10,          // Maximum number of connections in pool
-    queueLimit: 0,                // Unlimited queue
-    enableKeepAlive: true,        // Enable TCP keep-alive
-    keepAliveInitialDelay: 0      // Start keep-alive immediately
+    connectionLimit: 10,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
+
+    // Enable SSL in production (Railway requires this)
+    ssl: process.env.NODE_ENV === "production"
+        ? { rejectUnauthorized: false }
+        : false
 });
 
 // Test the pool connection
@@ -22,13 +22,13 @@ pool.getConnection((err, connection) => {
         console.error("Database connection failed:", err.message);
     } else {
         console.log("Database connected successfully!");
-        connection.release(); // Release connection back to pool
+        connection.release();
     }
 });
 
 // Handle pool errors
-pool.on('error', (err) => {
-    console.error('Database pool error:', err);
+pool.on("error", (err) => {
+    console.error("Database pool error:", err);
 });
 
 module.exports = pool;
