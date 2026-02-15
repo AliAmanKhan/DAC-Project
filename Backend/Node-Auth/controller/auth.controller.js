@@ -1,6 +1,6 @@
 const connection = require("../config/dbconfig.config");
 const bcrypt = require("bcrypt");
-const SECRET_KEY = process.env.SECRET_KEY || "jwt-secret";
+const SECRET_KEY = process.env.SECRET_KEY;
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { sendPasswordResetEmail } = require("../services/email.service");

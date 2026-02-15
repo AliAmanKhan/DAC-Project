@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-
+require("dotenv").config();
 // Create reusable transporter
 // For development, using a test account or configure with real SMTP
 const createTransporter = () => {
