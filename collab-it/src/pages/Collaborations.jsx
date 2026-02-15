@@ -216,9 +216,9 @@ export default function Collaborations() {
                             {collab.progress}%
                           </span>
                         </div>
-                        <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+                        <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
                           <div
-                            className="bg-gradient-to-r from-blue-500 to-cyan-400 h-full transition-all rounded-full shadow-lg shadow-blue-500/50"
+                            className="bg-gradient-to-r from-primary to-accent h-full transition-all rounded-full shadow-lg shadow-primary/50"
                             style={{ width: `${collab.progress}%` }}
                           />
                         </div>

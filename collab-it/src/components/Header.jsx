@@ -18,10 +18,10 @@ export default function Header({ setIsSidebarOpen }) {
   const avatarUrl = user?.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`;
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-slate-900 border-b border-slate-700 px-6 flex items-center justify-between">
+    <header className="sticky top-0 z-30 h-16 bg-header border-b border-header-border px-6 flex items-center justify-between transition-colors duration-300">
       {/* Mobile Menu Button */}
       <button
-        className="md:hidden text-slate-400 hover:text-white transition-colors"
+        className="md:hidden text-muted-foreground hover:text-foreground transition-colors"
         onClick={() => setIsSidebarOpen(true)}
       >
         <svg
@@ -40,7 +40,7 @@ export default function Header({ setIsSidebarOpen }) {
       </button>
 
       <div className="flex-1 text-center md:text-left">
-        <h2 className="text-white font-semibold">Welcome to Dashboard</h2>
+        <h2 className="text-foreground font-semibold">Welcome to Dashboard</h2>
       </div>
 
       {/* User Profile */}
@@ -50,7 +50,7 @@ export default function Header({ setIsSidebarOpen }) {
             data-tooltip-id="my-tooltip"
             data-tooltip-content="New Pitch"
             onClick={() => navigate("/create")}
-            className="icon text-2xl font-medium text-white bg-slate-800 border-b border-white hover:bg-slate-700 cursor-pointer"
+            className="icon text-2xl font-medium text-foreground bg-card border border-border hover:bg-sidebar-hover cursor-pointer transition-colors"
             style={{ borderRadius: "10%", padding: "0 8px 2px 8px" }}
           >
             +
@@ -61,15 +61,15 @@ export default function Header({ setIsSidebarOpen }) {
           {user && (
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="p-2 hover:bg-slate-800 rounded-lg transition relative text-white"
+              className="p-2 hover:bg-sidebar-hover rounded-lg transition relative text-foreground"
             >
               <Bell className="w-5 h-5" />
             </button>
           )}
 
           <div className="text-right">
-            <p className="text-sm font-medium text-white">{user?.fullName || user?.username || "Guest"}</p>
-            <p className="text-xs text-slate-400">{user?.email || "Member"}</p>
+            <p className="text-sm font-medium text-foreground">{user?.fullName || user?.username || "Guest"}</p>
+            <p className="text-xs text-muted-foreground">{user?.email || "Member"}</p>
           </div>
 
           <ProfileSidebar />

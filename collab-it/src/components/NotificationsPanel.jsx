@@ -72,19 +72,19 @@ export default function NotificationsPanel({ userId, isOpen, onClose }) {
   const unreadCount = notifications.filter((n) => n.status === "UNREAD").length;
 
   return (
-    <div className="fixed right-4 top-20 w-96 bg-gradient-to-br from-card via-slate-900 to-card border border-border rounded-lg shadow-2xl z-40 max-h-96 overflow-y-auto">
+    <div className="fixed right-4 top-20 w-96 bg-card border border-border rounded-xl shadow-2xl z-40 max-h-96 overflow-y-auto animate-fade-in">
       {/* Header */}
-      <div className="sticky top-0 p-4 border-b border-border/50 bg-gradient-to-r from-slate-800 to-slate-900 flex items-center justify-between">
+      <div className="sticky top-0 p-4 border-b border-border bg-header rounded-t-xl flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Bell className="w-5 h-5 text-primary" />
-          <h3 className="font-bold">Collaboration Requests</h3>
+          <h3 className="font-bold text-foreground">Collaboration Requests</h3>
           {unreadCount > 0 && (
-            <span className="px-2 py-1 bg-primary text-white text-xs rounded-full font-bold">
+            <span className="px-2 py-1 bg-primary text-primary-foreground text-xs rounded-full font-bold">
               {unreadCount}
             </span>
           )}
         </div>
-        <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
           ✕
         </button>
       </div>
@@ -98,7 +98,7 @@ export default function NotificationsPanel({ userId, isOpen, onClose }) {
         )}
 
         {error && (
-          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded text-red-500 text-sm">
+          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded text-destructive text-sm">
             {error}
           </div>
         )}
@@ -145,7 +145,7 @@ export default function NotificationsPanel({ userId, isOpen, onClose }) {
                         )
                       }
                       disabled={actionLoading[notification.collaborationRequestId]}
-                      className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-500/20 text-green-500 rounded hover:bg-green-500/30 transition text-sm font-medium disabled:opacity-50"
+                      className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-success/20 text-success rounded hover:bg-success/30 transition text-sm font-medium disabled:opacity-50"
                     >
                       <Check className="w-4 h-4" />
                       {actionLoading[notification.collaborationRequestId] === "accepting"
@@ -160,7 +160,7 @@ export default function NotificationsPanel({ userId, isOpen, onClose }) {
                         )
                       }
                       disabled={actionLoading[notification.collaborationRequestId]}
-                      className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-500/20 text-red-500 rounded hover:bg-red-500/30 transition text-sm font-medium disabled:opacity-50"
+                      className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-destructive/20 text-destructive rounded hover:bg-destructive/30 transition text-sm font-medium disabled:opacity-50"
                     >
                       <X className="w-4 h-4" />
                       {actionLoading[notification.collaborationRequestId] === "rejecting"

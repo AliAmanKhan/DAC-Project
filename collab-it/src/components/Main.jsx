@@ -46,7 +46,7 @@ export default function Main() {
 
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
+      <div className="min-h-screen bg-background transition-colors duration-300">
         <div className="flex h-screen">
 
           {/* Sidebar (Hidden on /login) */}
@@ -59,7 +59,7 @@ export default function Main() {
           )}
 
           {/* Main Content */}
-          <main className="flex-1 overflow-auto bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800">
+          <main className="flex-1 overflow-auto bg-background transition-colors duration-300">
 
             {/* Header (Hidden on /login) */}
             {!hideLayout && <Header setIsSidebarOpen={setIsSidebarOpen} />}

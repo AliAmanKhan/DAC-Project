@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: collabit-user
+    env: docker
+    rootDir: Backend/Services/collabit_user
+
+  - type: web
+    name: collabit-pitch
+    env: docker
+    rootDir: Backend/Services/collabit_pitch
+
+  - type: web
+    name: collabit-auth
+    env: docker
+    rootDir: Backend/Node-Auth
+
+  - type: web
+    name: collabit-gateway
+    env: docker
+    rootDir: Backend/API-Gateway

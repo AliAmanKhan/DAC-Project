@@ -95,7 +95,7 @@ export default function Messages() {
 
       {/* Main Content */}
       <section className="w-full px-0 sm:px-0 py-0">
-        <div className="flex gap-0 h-[calc(100vh-180px)] md:h-[calc(100vh-220px)] relative bg-slate-950">
+        <div className="flex gap-0 h-[calc(100vh-180px)] md:h-[calc(100vh-220px)] relative bg-background">
           {/* Mobile Overlay */}
           {showConversations && (
             <div
@@ -108,7 +108,7 @@ export default function Messages() {
           <div
             className={`${
               showConversations ? "flex z-40" : "hidden"
-            } md:flex md:z-auto w-full md:w-80 bg-slate-900 border-r border-border overflow-hidden flex-col fixed md:relative inset-0 md:inset-auto`}
+            } md:flex md:z-auto w-full md:w-80 bg-sidebar border-r border-border overflow-hidden flex-col fixed md:relative inset-0 md:inset-auto`}
           >
             {/* Search */}
             <div className="p-4 border-b border-border bg-card">
@@ -168,9 +168,9 @@ export default function Messages() {
           </div>
 
           {/* Chat Area */}
-          <div className="flex-1 bg-slate-950 border-l border-border flex flex-col">
+          <div className="flex-1 bg-background border-l border-border flex flex-col">
             {/* Header */}
-            <div className="p-4 md:p-6 border-b border-border flex items-center justify-between gap-4 bg-slate-900">
+            <div className="p-4 md:p-6 border-b border-border flex items-center justify-between gap-4 bg-header">
               <div className="flex items-center gap-3 min-w-0">
                 <button
                   onClick={() => setShowConversations(true)}
@@ -202,7 +202,7 @@ export default function Messages() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 bg-slate-950">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 bg-background">
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -214,8 +214,8 @@ export default function Messages() {
                     <div
                       className={`px-4 py-3 rounded-2xl max-w-sm break-words border ${
                         message.isOwn
-                          ? "bg-blue-600 text-white border-blue-500"
-                          : "bg-slate-800 text-white border-slate-700"
+                          ? "bg-primary text-primary-foreground border-primary/80"
+                          : "bg-card text-foreground border-border"
                       }`}
                     >
                       <p className="text-sm leading-relaxed">{message.content}</p>
@@ -223,8 +223,8 @@ export default function Messages() {
                     <p
                       className={`text-xs px-2 ${
                         message.isOwn
-                          ? "text-slate-400"
-                          : "text-slate-400"
+                          ? "text-muted-foreground"
+                          : "text-muted-foreground"
                       }`}
                     >
                       {message.timestamp}
@@ -235,7 +235,7 @@ export default function Messages() {
             </div>
 
             {/* Input */}
-            <div className="p-4 md:p-6 border-t border-border bg-slate-900">
+            <div className="p-4 md:p-6 border-t border-border bg-header">
               <form onSubmit={handleSendMessage} className="flex gap-3">
                 <input
                   type="text"

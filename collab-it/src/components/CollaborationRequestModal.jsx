@@ -29,7 +29,7 @@ export default function CollaborationRequestModal({ pitchId, onClose, onSuccess 
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-lg border border-emerald-500/30 max-w-md w-full mx-4 shadow-2xl">
+      <div className="bg-card rounded-xl border border-primary/30 max-w-md w-full mx-4 shadow-2xl">
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-xl font-bold">Request to Join</h2>
           <button

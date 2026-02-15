@@ -52,14 +52,14 @@ export default function ProfileSidebar() {
       {/* Profile icon (put this in your header/right corner) */}
       <button
         onClick={handleProfileClick}
-        className="flex items-center gap-2 rounded-full border border-slate-600 px-2 py-1 hover:bg-slate-800 transition"
+        className="flex items-center gap-2 rounded-full border border-border px-2 py-1 hover:bg-sidebar-hover transition"
       >
         <img
           src={avatarUrl}
           alt={user?.fullName || user?.username || 'User'}
           className="w-8 h-8 rounded-full"
         />
-        <span className="hidden sm:inline text-sm text-slate-200">{user?.fullName || user?.username || 'Profile'}</span>
+        <span className="hidden sm:inline text-sm text-muted-foreground">{user?.fullName || user?.username || 'Profile'}</span>
       </button>
 
       {/* Sliding sidebar + overlay (desktop/tablet only) */}
@@ -74,12 +74,12 @@ export default function ProfileSidebar() {
 
           {/* Sidebar */}
           <aside
-            className={`fixed inset-y-0 right-0 z-50 w-72 bg-slate-900 border-l border-slate-700 
+            className={`fixed inset-y-0 right-0 z-50 w-72 bg-sidebar border-l border-sidebar-border 
               transform transition-transform duration-300 ease-out
               ${isOpen ? "translate-x-0" : "translate-x-full"}`}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-4 border-b border-slate-700">
+            <div className="flex items-center justify-between px-4 py-4 border-b border-sidebar-border">
               <div className="flex items-center gap-3">
                 <img
                   src={avatarUrl}
@@ -87,13 +87,13 @@ export default function ProfileSidebar() {
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
-                  <p className="text-sm font-semibold text-white">{user?.fullName || user?.username || 'Guest'}</p>
-                  <p className="text-xs text-slate-400">{user?.email || 'Member'}</p>
+                  <p className="text-sm font-semibold text-foreground">{user?.fullName || user?.username || 'Guest'}</p>
+                  <p className="text-xs text-muted-foreground">{user?.email || 'Member'}</p>
                 </div>
               </div>
               <button
                 onClick={closeSidebar}
-                className="text-slate-400 hover:text-white"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 <svg
                   className="w-5 h-5"
@@ -118,11 +118,11 @@ export default function ProfileSidebar() {
                   key={item.path}
                   onClick={() => handleMenuClick(item.path)}
                   className="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm 
-                             text-slate-200 hover:bg-slate-800 transition"
+                             text-foreground hover:bg-sidebar-hover transition"
                 >
                   <span>{item.label}</span>
                   <svg
-                    className="w-4 h-4 text-slate-400"
+                    className="w-4 h-4 text-muted-foreground"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

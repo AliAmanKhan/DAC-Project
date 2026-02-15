@@ -63,47 +63,49 @@ export default function AddEducationModal({ isOpen, onClose, existingEducation =
 
   if (!isOpen) return null;
 
+  const inputClass = "w-full mt-1 p-2 rounded-lg bg-input border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition";
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-700 rounded-lg p-6 z-10">
-        <h3 className="text-lg font-semibold text-white mb-4">Add Education</h3>
-        {error && <p className="text-sm text-red-400 mb-3">{error}</p>}
+      <div className="relative w-full max-w-md bg-card border border-border rounded-xl p-6 z-10 shadow-2xl">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Add Education</h3>
+        {error && <p className="text-sm text-destructive mb-3">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="text-sm text-slate-400">Institution *</label>
-            <input value={institution} onChange={(e) => setInstitution(e.target.value)} className="w-full mt-1 p-2 rounded bg-slate-800 border border-slate-700 text-white" />
+            <label className="text-sm text-muted-foreground">Institution *</label>
+            <input value={institution} onChange={(e) => setInstitution(e.target.value)} className={inputClass} />
           </div>
 
           <div>
-            <label className="text-sm text-slate-400">Degree</label>
-            <input value={degree} onChange={(e) => setDegree(e.target.value)} className="w-full mt-1 p-2 rounded bg-slate-800 border border-slate-700 text-white" />
+            <label className="text-sm text-muted-foreground">Degree</label>
+            <input value={degree} onChange={(e) => setDegree(e.target.value)} className={inputClass} />
           </div>
 
           <div>
-            <label className="text-sm text-slate-400">Field of Study</label>
-            <input value={fieldOfStudy} onChange={(e) => setFieldOfStudy(e.target.value)} className="w-full mt-1 p-2 rounded bg-slate-800 border border-slate-700 text-white" />
+            <label className="text-sm text-muted-foreground">Field of Study</label>
+            <input value={fieldOfStudy} onChange={(e) => setFieldOfStudy(e.target.value)} className={inputClass} />
           </div>
 
           <div className="flex gap-2">
             <div className="flex-1">
-              <label className="text-sm text-slate-400">Start Year</label>
-              <input value={startYear} onChange={(e) => setStartYear(e.target.value)} className="w-full mt-1 p-2 rounded bg-slate-800 border border-slate-700 text-white" type="number" />
+              <label className="text-sm text-muted-foreground">Start Year</label>
+              <input value={startYear} onChange={(e) => setStartYear(e.target.value)} className={inputClass} type="number" />
             </div>
             <div className="flex-1">
-              <label className="text-sm text-slate-400">End Year</label>
-              <input value={endYear} onChange={(e) => setEndYear(e.target.value)} className="w-full mt-1 p-2 rounded bg-slate-800 border border-slate-700 text-white" type="number" />
+              <label className="text-sm text-muted-foreground">End Year</label>
+              <input value={endYear} onChange={(e) => setEndYear(e.target.value)} className={inputClass} type="number" />
             </div>
           </div>
 
           <div>
-            <label className="text-sm text-slate-400">Description</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full mt-1 p-2 rounded bg-slate-800 border border-slate-700 text-white" rows={3} />
+            <label className="text-sm text-muted-foreground">Description</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} className={inputClass} rows={3} />
           </div>
 
           <div className="flex justify-end gap-2 mt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded bg-slate-700 text-white">Cancel</button>
-            <button type="submit" disabled={saving} className="px-4 py-2 rounded bg-primary text-white">
+            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg bg-muted text-foreground hover:bg-muted/80 transition">Cancel</button>
+            <button type="submit" disabled={saving} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50">
               {saving ? "Saving..." : "Save"}
             </button>
           </div>

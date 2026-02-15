@@ -12,14 +12,14 @@ export const s3Service = {
    * @param {string} fileName - Name of the file to upload
    * @returns {Promise<string>} - Presigned URL from the backend
    */
-  getProfileImageUploadUrl: async (fileName) => {
+  getProfileImageUploadUrl: async (fileName, contentType = "image/jpeg") => {
     try {
       const token = authService.getToken();
       const headers = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
       const response = await fetch(
-        `${USER_SERVICE_URL}/users/profile-image/upload-url?fileName=${encodeURIComponent(fileName)}`,
+        `${USER_SERVICE_URL}/users/profile-image/upload-url?fileName=${encodeURIComponent(fileName)}&contentType=${encodeURIComponent(contentType)}`,
         {
           headers,
         }
@@ -77,9 +77,9 @@ export const s3Service = {
       const response = await fetch(presignedUrl, {
         method: "PUT",
         headers: {
-          "Content-Type": contentType,
+          "Content-Type": file.type
         },
-        body: file,
+        body: file
       });
 
       if (!response.ok) {
@@ -114,8 +114,10 @@ export const s3Service = {
       const fileName = `${timestamp}-${file.name}`;
 
       let presignedUrl;
+      const contentType = file.type || "image/jpeg";
+
       if (type === "profile") {
-        presignedUrl = await s3Service.getProfileImageUploadUrl(fileName);
+        presignedUrl = await s3Service.getProfileImageUploadUrl(fileName, contentType);
       } else if (type === "pitch") {
         presignedUrl = await s3Service.getPitchImageUploadUrl(fileName);
       } else {

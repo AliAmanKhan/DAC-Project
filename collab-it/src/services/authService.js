@@ -18,6 +18,7 @@ export const authService = {
       };
 
       console.log("Signup Request URL:", `${API_BASE_URL}/signup`);
+      
       const response = await fetch(`${API_BASE_URL}/signup`, {
         method: "POST",
         headers: {

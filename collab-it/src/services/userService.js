@@ -2,7 +2,7 @@
 import { USER_SERVICE_URL } from "../config";
 import { authService } from "./authService";
 
-const API_BASE_URL = `${USER_SERVICE_URL}/users`; 
+const API_BASE_URL = `${USER_SERVICE_URL}/users`;
 
 export const userService = {
   updateMyProfile: async (userId, profile) => {
@@ -24,7 +24,7 @@ export const userService = {
         const err = await response.json().catch(() => ({}));
         throw new Error(err.message || "Update profile failed");
       }
-      return;
+      return await response.json();
     } catch (err) {
       throw err;
     }
@@ -79,7 +79,10 @@ export const userService = {
         const err = await response.json().catch(() => ({}));
         throw new Error(err.message || "Fetch full profile failed");
       }
-      return await response.json();
+
+      const data = await response.json();
+      console.log("Full Profile Data:", data);
+      return data;
     } catch (err) {
       throw err;
     }

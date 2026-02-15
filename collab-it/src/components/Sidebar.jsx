@@ -165,16 +165,16 @@ export default function Sidebar({
   return (
     <>
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-700 transform transition-transform duration-300 ease-out
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transform transition-all duration-300 ease-out
           ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0 md:relative md:w-64`}
       >
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between h-16 px-6 border-b border-slate-700">
+        <div className="flex items-center justify-between h-16 px-6 border-b border-sidebar-border">
           <img src={logo} alt="CollabIt" className="h-30 w-auto align-middle" />
           {/* Close Button (Mobile Only) */}
           <button
-            className="md:hidden text-slate-400 hover:text-white transition-colors"
+            className="md:hidden text-sidebar-text hover:text-foreground transition-colors"
             onClick={() => setIsSidebarOpen(false)}
           >
             <svg
@@ -194,7 +194,7 @@ export default function Sidebar({
         </div>
 
         {/* Navigation Menu */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = activeItem === item.id;
 
@@ -206,26 +206,26 @@ export default function Sidebar({
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200
                   ${
                     isActive
-                      ? "bg-blue-700 text-white border-1 border-white"
-                      : "text-slate-300 hover:bg-blue-900 hover:text-white bg-blue-800"
+                      ? "bg-sidebar-active text-sidebar-active-text shadow-md shadow-primary/20"
+                      : "text-sidebar-text hover:bg-sidebar-hover hover:text-foreground"
                   }`}
               >
                 {item.icon}
-                <span>{item.label}</span>
+                <span className="font-medium">{item.label}</span>
               </button>
             );
           })}
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-slate-700">
+        <div className="p-4 border-t border-sidebar-border">
           <button
             onClick={() => {
               logout();
               navigate("/login");
               handleNavClick();
             }}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-200"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-text hover:bg-sidebar-hover hover:text-foreground transition-all duration-200"
           >
             <svg
               className="w-5 h-5"
@@ -247,7 +247,7 @@ export default function Sidebar({
 
       {/* Overlay (Mobile Only) */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden transition-opacity duration-300
+        className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300
           ${isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         onClick={() => setIsSidebarOpen(false)}
       />

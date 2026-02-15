@@ -13,7 +13,7 @@ app.use("/auth", authRouter);
 //     res.send("Welcome to Node-Auth Service");
 // });
 
-const PORT = 3050;
+const PORT = process.env.PORT || 3050;
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`)
 })

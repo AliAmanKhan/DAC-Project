@@ -5,18 +5,27 @@ import { s3Service } from '../services/s3Service';
 import { useAuth } from '../context/AuthContext';
 import AddEducationModal from '../components/AddEducationModal';
 
+import { Camera, Github, Linkedin, Twitter, Globe, Link as LinkIcon, Edit2, X, Check } from "lucide-react";
+
 export default function Profile() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, updateUser, refreshUserProfile } = useAuth();
   const [profile, setProfile] = useState(user || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showAddEducation, setShowAddEducation] = useState(false);
   const [editingSocial, setEditingSocial] = useState(false);
-  const [socialLinks, setSocialLinks] = useState([]);
+  const [socialForm, setSocialForm] = useState({
+    GITHUB: "",
+    LINKEDIN: "",
+    TWITTER: "",
+    PORTFOLIO: ""
+  });
   const [savingSocial, setSavingSocial] = useState(false);
   const [socialError, setSocialError] = useState(null);
   const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
   const [profileImageError, setProfileImageError] = useState(null);
+  const [editingPhone, setEditingPhone] = useState(false);
+  const [phoneInput, setPhoneInput] = useState("");
 
   const fetchProfile = async () => {
     if (!isAuthenticated) return;
@@ -27,18 +36,28 @@ export default function Profile() {
       const targetId = currentUser?.userId || currentUser?.id;
       let p;
       if (targetId) {
+        console.log("Target id found");
         p = await userService.getFullProfile(targetId);
       } else {
+        console.log("No target id found");
         p = await userService.getMyProfile();
       }
       setProfile(p);
 
-      // initialize social links state when fetching own profile
-      const viewerId = currentUser?.id || currentUser?.userId;
-      if (viewerId && p?.userId && viewerId === p.userId) {
-        setSocialLinks(p.socialLinks || []);
-      } else {
-        setSocialLinks(p.socialLinks || []);
+      // initialize social links form state when fetching own profile
+      if (p?.socialLinks) {
+        const form = {
+          GITHUB: "",
+          LINKEDIN: "",
+          TWITTER: "",
+          PORTFOLIO: ""
+        };
+        p.socialLinks.forEach(link => {
+          if (link.platform && form.hasOwnProperty(link.platform)) {
+            form[link.platform] = link.url;
+          }
+        });
+        setSocialForm(form);
       }
 
     } catch (err) {
@@ -65,6 +84,8 @@ export default function Profile() {
     try {
       // Upload to S3 and get URL
       const s3Url = await s3Service.uploadFile(file, "profile");
+      console.log("Uploaded S3 URL:", s3Url);
+      console.log("Current Profile State:", profile);
 
       // Update profile with new image URL
       const currentUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -72,10 +93,20 @@ export default function Profile() {
 
       if (!userId) throw new Error("User ID not found");
 
-      await userService.updateMyProfile(userId, {
-        ...profile,
+      // Create a clean payload with only allowed fields
+      const payload = {
+        fullName: profile.fullName,
+        bio: profile.bio,
+        dob: profile.dob,
+        gender: profile.gender,
         profileImage: s3Url,
-      });
+        college: profile.college,
+        branch: profile.branch,
+        graduationYear: profile.graduationYear,
+        visibility: profile.visibility || "PUBLIC"
+      };
+
+      await userService.updateMyProfile(userId, payload);
 
       // Update local state
       setProfile((prev) => ({
@@ -86,6 +117,11 @@ export default function Profile() {
       // Update localStorage
       const updatedUser = { ...currentUser, profileImage: s3Url };
       localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      // Sync global auth state (updates Header immediately)
+      if (updateUser) {
+        updateUser((prev) => ({ ...prev, profileImage: s3Url }));
+      }
     } catch (err) {
       setProfileImageError(err.message || "Failed to upload profile image");
       console.error("Profile image upload error:", err);
@@ -113,9 +149,11 @@ export default function Profile() {
                 className="rounded-full w-32 h-32 border border-blue-500 shadow-md object-cover cursor-pointer group-hover:opacity-75 transition"
               />
               <label className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition cursor-pointer">
-                <span className="text-white text-sm font-semibold">
-                  {uploadingProfileImage ? "Uploading..." : "Change"}
-                </span>
+                {uploadingProfileImage ? (
+                  <span className="text-white text-sm font-semibold">Uploading...</span>
+                ) : (
+                  <Camera className="w-8 h-8 text-white" />
+                )}
                 <input
                   type="file"
                   accept="image/*"
@@ -188,7 +226,68 @@ export default function Profile() {
 
             <div className="flex justify-between items-center border-b border-slate-700 pb-2">
               <span className="text-slate-400 text-sm">Phone</span>
-              <p className="text-white text-base">{profile?.phone || '—'}</p>
+              {editingPhone ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="tel"
+                    value={phoneInput}
+                    onChange={(e) => setPhoneInput(e.target.value)}
+                    className="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-white text-sm w-32 focus:border-blue-500 focus:outline-none"
+                    placeholder="Enter phone"
+                  />
+                  <button
+                    onClick={async () => {
+                       try {
+                         const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+                         const userId = currentUser?.id || currentUser?.userId;
+                         
+                         const payload = {
+                           fullName: profile.fullName,
+                           bio: profile.bio,
+                           dob: profile.dob,
+                           gender: profile.gender,
+                           profileImage: profile.profileImage,
+                           college: profile.college,
+                           branch: profile.branch,
+                           graduationYear: profile.graduationYear,
+                           visibility: profile.visibility || "PUBLIC",
+                           phone: phoneInput
+                         };
+
+                         await userService.updateMyProfile(userId, payload);
+                         setProfile(prev => ({ ...prev, phone: phoneInput }));
+                         setEditingPhone(false);
+                         await fetchProfile(); // refresh to be sure
+                       } catch (err) {
+                         console.error("Failed to update phone:", err);
+                         // optionally set error state
+                       }
+                    }}
+                    className="text-green-400 hover:text-green-300 transition-colors"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setEditingPhone(false)}
+                    className="text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 group">
+                  <p className="text-white text-base">{profile?.phone || '—'}</p>
+                  {/* show edit button if viewing own profile */}
+                  {profile?.userId && (JSON.parse(localStorage.getItem('user') || 'null')?.id || JSON.parse(localStorage.getItem('user') || 'null')?.userId) === profile.userId && (
+                    <button 
+                      onClick={() => { setPhoneInput(profile?.phone || ""); setEditingPhone(true); }}
+                      className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-blue-400 transition-all"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -196,106 +295,159 @@ export default function Profile() {
               <p className="text-white text-base">{profile?.bio || '—'}</p>
             </div>
 
-            <div className="flex justify-between items-center border-b border-slate-700 pb-2">
-              <span className="text-slate-400 text-sm">Social Links</span>
-              <div className="text-right">
-                {profile?.socialLinks && profile.socialLinks.length > 0 ? (
-                  <div className="flex flex-col items-end">
-                    {profile.socialLinks.map((s) => (
-                      <a key={s.id || s.platform} href={s.url} target="_blank" rel="noreferrer" className="text-blue-400 text-base hover:underline">{s.platform}: {s.url}</a>
-                    ))}
+            <div className="flex justify-between items-start border-b border-slate-700 pb-4">
+              <span className="text-slate-400 text-sm w-32 shrink-0 pt-2">Social Links</span>
+              <div className="flex-1">
+                {!editingSocial ? (
+                  <div className="flex flex-col items-end gap-3">
+                    {profile?.socialLinks && profile.socialLinks.length > 0 ? (
+                      profile.socialLinks.map((s) => {
+                        const Icon = s.platform === 'GITHUB' ? Github :
+                                     s.platform === 'LINKEDIN' ? Linkedin :
+                                     s.platform === 'TWITTER' ? Twitter : Globe;
+                        return (
+                          <a 
+                            key={s.id || s.platform} 
+                            href={s.url} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors group"
+                          >
+                            <span className="text-sm font-medium group-hover:underline">{s.platform === 'PORTFOLIO' ? 'Portfolio' : s.platform.charAt(0) + s.platform.slice(1).toLowerCase()}</span>
+                            <Icon className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
+                          </a>
+                        );
+                      })
+                    ) : (
+                      <p className="text-slate-500 text-sm italic">No links added</p>
+                    )}
+
+                    {/* Show edit button if viewing own profile */}
+                    {profile?.userId && (JSON.parse(localStorage.getItem('user') || 'null')?.id || JSON.parse(localStorage.getItem('user') || 'null')?.userId) === profile.userId && (
+                      <button 
+                        onClick={() => setEditingSocial(true)} 
+                        className="mt-2 flex items-center gap-1.5 text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors px-3 py-1.5 rounded-md hover:bg-slate-800/50"
+                      >
+                        <Edit2 className="w-3 h-3" /> Edit Links
+                      </button>
+                    )}
                   </div>
                 ) : (
-                  <p className="text-muted-foreground">—</p>
-                )}
+                  <div className="bg-slate-900/50 p-5 rounded-xl border border-slate-700/50 backdrop-blur-sm">
+                    <div className="flex justify-between items-center mb-4">
+                      <h4 className="text-white font-semibold text-sm uppercase tracking-wider">Edit Social Links</h4>
+                      <button onClick={() => { setEditingSocial(false); setSocialError(null); fetchProfile(); }} className="text-slate-400 hover:text-white transition-colors">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {/* GitHub */}
+                      <div className="relative group/input">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Github className="h-5 w-5 text-slate-500 group-focus-within/input:text-white transition-colors" />
+                        </div>
+                        <input
+                          type="url"
+                          value={socialForm.GITHUB}
+                          onChange={(e) => setSocialForm({ ...socialForm, GITHUB: e.target.value })}
+                          className="block w-full pl-10 pr-3 py-2.5 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-white placeholder-slate-500 text-sm transition-all shadow-sm"
+                          placeholder="https://github.com/username"
+                        />
+                      </div>
 
-                {/* show edit button if viewing own profile */}
-                {profile?.userId && (JSON.parse(localStorage.getItem('user') || 'null')?.id || JSON.parse(localStorage.getItem('user') || 'null')?.userId) === profile.userId && (
-                  <div className="mt-2 flex items-center justify-end gap-2">
-                    <button onClick={() => setEditingSocial(true)} className="text-sm text-primary hover:underline">Edit</button>
+                      {/* LinkedIn */}
+                      <div className="relative group/input">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Linkedin className="h-5 w-5 text-slate-500 group-focus-within/input:text-blue-400 transition-colors" />
+                        </div>
+                        <input
+                          type="url"
+                          value={socialForm.LINKEDIN}
+                          onChange={(e) => setSocialForm({ ...socialForm, LINKEDIN: e.target.value })}
+                          className="block w-full pl-10 pr-3 py-2.5 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-white placeholder-slate-500 text-sm transition-all shadow-sm"
+                          placeholder="https://linkedin.com/in/username"
+                        />
+                      </div>
+
+                      {/* Twitter */}
+                      <div className="relative group/input">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Twitter className="h-5 w-5 text-slate-500 group-focus-within/input:text-sky-400 transition-colors" />
+                        </div>
+                        <input
+                          type="url"
+                          value={socialForm.TWITTER}
+                          onChange={(e) => setSocialForm({ ...socialForm, TWITTER: e.target.value })}
+                          className="block w-full pl-10 pr-3 py-2.5 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-white placeholder-slate-500 text-sm transition-all shadow-sm"
+                          placeholder="https://twitter.com/username"
+                        />
+                      </div>
+
+                      {/* Portfolio */}
+                      <div className="relative group/input">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Globe className="h-5 w-5 text-slate-500 group-focus-within/input:text-emerald-400 transition-colors" />
+                        </div>
+                        <input
+                          type="url"
+                          value={socialForm.PORTFOLIO}
+                          onChange={(e) => setSocialForm({ ...socialForm, PORTFOLIO: e.target.value })}
+                          className="block w-full pl-10 pr-3 py-2.5 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-white placeholder-slate-500 text-sm transition-all shadow-sm"
+                          placeholder="https://your-portfolio.com"
+                        />
+                      </div>
+
+                      {socialError && (
+                        <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs p-3 rounded-lg flex items-center gap-2">
+                           <span className="block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                           {socialError}
+                        </div>
+                      )}
+
+                      <div className="pt-2 flex justify-end gap-3">
+                        <button 
+                          onClick={() => { setEditingSocial(false); setSocialError(null); fetchProfile(); }} 
+                          className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          onClick={async () => {
+                            const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+                            const userId = currentUser?.id || currentUser?.userId;
+
+                            try {
+                              setSavingSocial(true);
+                              setSocialError(null);
+
+                              // Prepare payload from form state
+                              const links = Object.entries(socialForm)
+                                .filter(([_, url]) => url && url.trim().length > 0)
+                                .map(([platform, url]) => ({
+                                  platform,
+                                  url: url.trim().match(/^https?:\/\//i) ? url.trim() : `https://${url.trim()}`
+                                }));
+
+                              await userService.updateSocialLinks(userId, links);
+                              setEditingSocial(false);
+                              await fetchProfile();
+                            } catch (err) {
+                              setSocialError(err.message || 'Failed to save social links');
+                            } finally { setSavingSocial(false); }
+                          }} 
+                          disabled={savingSocial}
+                          className="px-6 py-2 text-sm font-medium bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-lg shadow-lg hover:shadow-blue-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                          {savingSocial ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : null}
+                          {savingSocial ? 'Saving...' : 'Save Changes'}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
-
-            {editingSocial && (
-              <div className="mt-4 p-4 bg-slate-900 rounded-lg border border-slate-700">
-                <h4 className="text-white font-semibold mb-2">Edit Social Links</h4>
-                <div className="space-y-2">
-                  {socialLinks.map((link, idx) => (
-                    <div key={idx} className="flex gap-2">
-                      <input type="text" value={link.platform || ''} onChange={(e) => {
-                        const next = [...socialLinks]; next[idx] = { ...next[idx], platform: e.target.value }; setSocialLinks(next);
-                      }} placeholder="Platform (e.g., Twitter)" className="w-1/3 px-3 py-2 rounded bg-input border border-border" />
-                      <input type="url" value={link.url || ''} onChange={(e) => {
-                        const next = [...socialLinks]; next[idx] = { ...next[idx], url: e.target.value }; setSocialLinks(next);
-                      }} placeholder="https://..." className="flex-1 px-3 py-2 rounded bg-input border border-border" />
-                      <button onClick={() => { setSocialError(null); setSocialLinks(socialLinks.filter((_, i) => i !== idx)); }} className="text-red-400">Remove</button>
-                    </div>
-                  ))}
-
-                  <div className="flex gap-2">
-                    <button onClick={() => setSocialLinks([...socialLinks, { platform: '', url: '' }])} className="text-sm text-primary hover:underline">+ Add Link</button>
-                  </div>
-
-                  {socialError && <p className="text-red-400 text-sm">{socialError}</p>}
-
-                  <div className="mt-3 flex gap-2 justify-end">
-                    <button onClick={() => { setEditingSocial(false); setSocialError(null); fetchProfile(); }} className="px-4 py-2 rounded border border-slate-700">Cancel</button>
-                    <button onClick={async () => {
-                      // save with normalization and validation
-                      const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
-                      const userId = currentUser?.id || currentUser?.userId;
-
-                      const normalizePlatform = (p) => {
-                        if (!p) return p;
-                        const s = p.trim().toLowerCase();
-                        if (s.includes('git')) return 'GITHUB';
-                        if (s.includes('linkedin')) return 'LINKEDIN';
-                        if (s.includes('twitter')) return 'TWITTER';
-                        if (s.includes('portfolio') || s.includes('site') || s.includes('website')) return 'PORTFOLIO';
-                        return s.toUpperCase();
-                      };
-
-                      try {
-                        setSavingSocial(true);
-                        setSocialError(null);
-
-                        // prepare payload
-                        const cleaned = socialLinks
-                          .filter(s => s && s.url && s.platform)
-                          .map(s => ({ platform: normalizePlatform(s.platform), url: (s.url || '').trim() }));
-
-                        if (cleaned.length === 0) {
-                          // allow clearing all links
-                          await userService.updateSocialLinks(userId, []);
-                          setEditingSocial(false);
-                          await fetchProfile();
-                          return;
-                        }
-
-                        // validate platforms
-                        const allowed = ['PORTFOLIO','GITHUB','LINKEDIN','TWITTER'];
-                        const invalid = cleaned.find(c => !allowed.includes(c.platform));
-                        if (invalid) {
-                          setSocialError(`Unknown platform: ${invalid.platform}. Use one of: ${allowed.join(', ')}`);
-                          return;
-                        }
-
-                        // simple url normalization: ensure scheme exists
-                        const withUrls = cleaned.map(c => ({ ...c, url: c.url.match(/^https?:\/\//i) ? c.url : `https://${c.url}` }));
-
-                        await userService.updateSocialLinks(userId, withUrls);
-                        setEditingSocial(false);
-                        await fetchProfile();
-                      } catch (err) {
-                        setSocialError(err.message || 'Failed to save social links');
-                      } finally { setSavingSocial(false); }
-                    }} className="px-4 py-2 rounded bg-primary text-white">{savingSocial ? 'Saving...' : 'Save'}</button>
-                  </div>
-                </div>
-              </div>
-            )}
 
             <div className="flex justify-between items-center">
               <span className="text-slate-400 text-sm">Gender</span>

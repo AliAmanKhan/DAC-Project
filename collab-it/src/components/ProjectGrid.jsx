@@ -7,8 +7,8 @@ export default function ProjectsGrid({ projects }) {
         {projects.map((project) => (
           <div
             key={project.id}
-            className="bg-blue-800/40 border border-blue-700 rounded-lg shadow-md 
-                       hover:shadow-blue-900/40 hover:border-blue-500 transition-all duration-300"
+            className="bg-card border border-border rounded-lg shadow-md 
+                       hover:shadow-xl hover:border-primary/50 transition-all duration-300 card-hover"
           >
             {/* Image */}
             <div className="h-40 overflow-hidden rounded-t-lg">
@@ -21,11 +21,11 @@ export default function ProjectsGrid({ projects }) {
 
             {/* Content */}
             <div className="p-4">
-              <h3 className="text-white text-lg font-semibold mb-2">
+              <h3 className="text-foreground text-lg font-semibold mb-2">
                 {project.title}
               </h3>
 
-              <p className="text-slate-300 text-sm mb-4">
+              <p className="text-muted-foreground text-sm mb-4">
                 {project.description}
               </p>
 
@@ -34,8 +34,8 @@ export default function ProjectsGrid({ projects }) {
                 {project.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 text-xs bg-blue-700/60 text-blue-200 
-                               border border-blue-600 rounded-full"
+                    className="px-2 py-1 text-xs bg-primary/20 text-primary 
+                               border border-primary/30 rounded-full"
                   >
                     {tag}
                   </span>
