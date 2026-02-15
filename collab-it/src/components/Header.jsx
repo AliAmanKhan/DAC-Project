@@ -45,7 +45,7 @@ export default function Header({ setIsSidebarOpen }) {
 
       {/* User Profile */}
       <div className="flex items-center gap-4">
-        <div className="hidden sm:flex items-center gap-3">
+        <div className="flex items-center gap-3">
           <div
             data-tooltip-id="my-tooltip"
             data-tooltip-content="New Pitch"
@@ -67,7 +67,7 @@ export default function Header({ setIsSidebarOpen }) {
             </button>
           )}
 
-          <div className="text-right">
+          <div className="hidden sm:block text-right">
             <p className="text-sm font-medium text-foreground">{user?.fullName || user?.username || "Guest"}</p>
             <p className="text-xs text-muted-foreground">{user?.email || "Member"}</p>
           </div>
